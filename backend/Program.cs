@@ -1,8 +1,28 @@
+using backend.Models;
+using backend.Repositories.UserRepository;
+using backend.Services.UserService;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
-builder.Services.AddControllers();
+builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -19,6 +39,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+var services = builder.Services;
+services.AddHttpContextAccessor();
+
+services.AddScoped<IUserRepository, UserRepository>();
+services.AddScoped<IUserService, UserService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,6 +59,8 @@ app.UseHttpsRedirection();
 
 // Use CORS
 app.UseCors("CorsPolicy");
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
