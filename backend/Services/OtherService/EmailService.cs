@@ -26,23 +26,19 @@ namespace backend.Services.OtherService
             {
                 // With type == 1, create account
                 // With type == 2, forgot password
-                // With type == 3, update password
                 string _text = "";
                 string subject = "";
                 if (type == 1)
                 {
                     _text = EmailHelper.Instance.RegisterMail(fullname, account, password);
-                    subject = "Welcome to FPT TicketHub - Confirm Account";
+                    subject = "Đăng ký tài khoản FPTTicketHub - Xác nhận tài khoản";
                 }
                 if (type == 2)
                 {
                     _text = EmailHelper.Instance.ForgotMail(fullname, account, password);
-                    subject = "FPT TicketHub Account Support - Forgot Password";
+                    subject = "Hỗ trợ tài khoản FPTTicketHub - Quên mật khẩu";
                 }
-                //else
-                //{
-                //    _text = EmailHelper.Instance.BodyUpdate(fullname, account, password);
-                //}
+
                 var email = new MimeMessage();
                 email.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));
                 email.To.Add(MailboxAddress.Parse(mail));

@@ -9,8 +9,6 @@ public partial class Orderdetail
 
     public int OrderId { get; set; }
 
-    public int? TicketId { get; set; }
-
     public DateTime? OrderDate { get; set; }
 
     public decimal? Subtotal { get; set; }
@@ -21,5 +19,5 @@ public partial class Orderdetail
 
     public virtual Order Order { get; set; } = null!;
 
-    public virtual Ticket? Ticket { get; set; }
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

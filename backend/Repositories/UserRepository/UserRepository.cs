@@ -92,7 +92,7 @@ namespace backend.Repositories.UserRepository
                 var newAccount = new Account();
                 newAccount.FullName = register.FullName;
                 newAccount.Email = register.Email;
-                newAccount.CreateDate = DateTime.Now;
+                newAccount.CreateDate = DateTime.Now;   
                 newAccount.Status = "Đang hoạt động";
                 newAccount.Avatar = register.Avatar;
                 newAccount.RoleId = 2;

@@ -238,10 +238,6 @@ public partial class FpttickethubContext : DbContext
                 .HasForeignKey(d => d.OrderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ORDERDETAIL_ORDER");
-
-            entity.HasOne(d => d.Ticket).WithMany(p => p.Orderdetails)
-                .HasForeignKey(d => d.TicketId)
-                .HasConstraintName("FK_ORDERDETAIL_TICKET");
         });
 
         modelBuilder.Entity<Payment>(entity =>
@@ -359,6 +355,11 @@ public partial class FpttickethubContext : DbContext
             entity.Property(e => e.CheckInDate).HasColumnType("datetime");
             entity.Property(e => e.Status).HasMaxLength(100);
             entity.Property(e => e.TicketCode).IsUnicode(false);
+
+            entity.HasOne(d => d.OrderDetail).WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.OrderDetailId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TICKET_ORDERDETAIL");
 
             entity.HasOne(d => d.TicketType).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.TicketTypeId)

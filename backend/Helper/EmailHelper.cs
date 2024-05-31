@@ -79,21 +79,28 @@
                                 border-collapse: collapse !important;
                             }}
 
-                            button {{
-                                background-color: #1a82e2;
-                                cursor: pointer;
-                            }}
-
-                            button:hover {{
-                                background-color: #06294983;
-                            }}
-
                             img {{
                                 height: auto;
                                 line-height: 100%;
                                 text-decoration: none;
                                 border: 0;
                                 outline: none;
+                            }}
+
+                            .button {{
+                                display: inline-block;
+                                padding: 12px 30px;
+                                font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;
+                                font-size: 16px;
+                                text-decoration: none;
+                                border-radius: 50px;
+                                background-color: #EC6C21;
+                                color: #ffffff !important;
+                                margin-top: 20px;
+                            }}
+
+                            .button:hover {{
+                                background-color: #81360b;
                             }}
                         </style>
 
@@ -106,9 +113,9 @@
                             <tr>
                                 <td align=""center"" bgcolor=""#e9ecef"">
                                     <table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""max-width: 600px;"">
-                                        <tr>
-                                            <td align=""left"" bgcolor=""#ffffff"" style=""padding: 36px 24px 0; border-top: 3px solid #d4dadf;"">
-                                                <h1 style=""margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;text-align: center;"">ACCOUNT CONFIRM</h1>
+                                        <tr style=""height: full;"">
+                                            <td align=""left"" bgcolor=""#150d0a"" style=""border-bottom: solid 5px #EC6C21; text-align: center;"">
+                                                <img src=""https://i.imgur.com/jxQVXhx.png"" alt=""logo"" style=""width: full; height: 100px;"">
                                             </td>
                                         </tr>
                                     </table>
@@ -120,13 +127,14 @@
                                         <tr>
                                             <td align=""left"" bgcolor=""#ffffff"" style=""padding: 24px; font-size: 16px; line-height: 24px;"">
                                                 <p style=""margin: 0;"">Dear {fullname}, <br />
-                                                Chúng tôi nhận được yêu cầu đăng ký của bạn, đây là thông tin tài khoản và mật khẩu của bạn:<br /><br />
-                                                Tài khoản: <strong>{email}</strong><br />
-                                                Mật khẩu: <strong>{password}</strong><br />
-                                                Không chia sẻ mật khẩu với bất kỳ ai. Vui lòng đổi mật khẩu sau khi nhận được email này. <br /><br />
-                                                Kích hoạt tài khoản: <a href=https://localhost:7096/api/home/confirm?email={email} target=""_blank""
-                                                    style=""display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px;text-decoration: none; border-radius: 6px;"">Nhấn vào đây</a><br/>
-                                                Chúc bạn có trải nghiệm tốt.
+                                                    Chúng tôi nhận được yêu cầu đăng ký của bạn, đây là thông tin tài khoản và mật khẩu của bạn:<br /><br />
+                                                    Tài khoản: <strong>{email}</strong><br />
+                                                    Mật khẩu: <strong>{password}</strong><br />
+                                                    Không chia sẻ mật khẩu với bất kỳ ai. Vui lòng đổi mật khẩu sau khi nhận được email này. <br /><br />
+                                                    Bấm nút xác thực bên dưới để xác nhận tài khoản.<br />
+                                                    <a href=""https://localhost:7096/api/home/confirm?email={email}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
+                                                    Chúc bạn có trải nghiệm tốt.
+                                                </p>
                                             </td>
                                         </tr>
                                         <tr>
@@ -137,7 +145,7 @@
                                                             <table border=""0"" cellpadding=""0"" cellspacing=""0"">
                                                                 <tr>
                                                                     <td align=""center"" bgcolor=""#1a82e2"" style=""border-radius: 6px;"">
-                                                    
+
                                                                     </td>
                                                                 </tr>
                                                             </table>
@@ -147,8 +155,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td align=""left"" bgcolor=""#ffffff""
-                                                style=""padding: 24px; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf"">
+                                            <td align=""left"" bgcolor=""#ffffff"" style=""padding: 24px; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf"">
                                                 <p style=""margin: 0;""><br></p>
                                             </td>
                                         </tr>
@@ -280,11 +287,9 @@
                         <tr>
                             <td align='center' bgcolor='#e9ecef'>
                                 <table border='0' cellpadding='0' cellspacing='0' width='100%' style='max-width: 600px;'>
-                                    <tr>
-                                        <td align='left' bgcolor='#ffffff' style='padding: 36px 24px 0; border-top: 3px solid #d4dadf;'>
-                                            <h1 style='margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px; text-align: center;'>
-                                                FORGOT PASSWORD
-                                            </h1>
+                                    <tr style=""height: full;"">
+                                        <td align=""left"" bgcolor=""#150d0a"" style=""border-bottom: solid 5px #EC6C21; text-align: center;"">
+                                            <img src=""https://i.imgur.com/jxQVXhx.png"" alt=""logo"" style=""width: full; height: 100px;"">
                                         </td>
                                     </tr>
                                 </table>
