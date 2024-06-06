@@ -132,7 +132,7 @@
                                                     Mật khẩu: <strong>{password}</strong><br />
                                                     Không chia sẻ mật khẩu với bất kỳ ai. Vui lòng đổi mật khẩu sau khi nhận được email này. <br /><br />
                                                     Bấm nút xác thực bên dưới để xác nhận tài khoản.<br />
-                                                    <a href=""https://localhost:7096/api/home/confirm?email={email}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
+                                                    <a href=""http://localhost:3000/confirmaccount/{email}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
                                                     Chúc bạn có trải nghiệm tốt.
                                                 </p>
                                             </td>
@@ -301,7 +301,7 @@
                                     <tr>
                                         <td align='left' bgcolor='#ffffff' style='padding: 24px; font-size: 16px; line-height: 24px;'>
                                             <p style='margin: 0;'>Dear {fullname}, <br />
-                                                Chúng tôi đã nhận được yêu cầu mật khẩu mới từ bạn. Hãy sử dụng mật khẩu dưới đây để đăng nhập:
+                                                Chúng tôi đã nhận được yêu cầu mật khẩu mới từ tài khoản {email} của bạn. Hãy sử dụng mật khẩu dưới đây để đăng nhập:
                                                 <br/><br/>
                                                 Mật khẩu mới: <strong>{password}</strong><br /><br />
                                                 Không chia sẻ mật khẩu này với bất kỳ ai. Bạn nên đổi mật khẩu sau khi nhận được mật khẩu này.
