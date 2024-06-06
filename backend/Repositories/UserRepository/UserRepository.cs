@@ -32,11 +32,13 @@ namespace backend.Repositories.UserRepository
             }
             else
             {
-                account.Password = GenerateRandomString();
+                var unencryptedPassword = GenerateRandomString();
+                account.Password = BCrypt.Net.BCrypt.HashPassword(unencryptedPassword);
+                //account.Password = GenerateRandomString();
                 _context.SaveChanges();
                 try
                 {
-                    EmailService.Instance.SendMail(account.Email, 2, account.FullName, account.Email, account.Password);
+                    EmailService.Instance.SendMail(account.Email, 2, account.FullName, account.Email, unencryptedPassword);
                 }
                 catch
                 {
@@ -96,7 +98,8 @@ namespace backend.Repositories.UserRepository
                 newAccount.Status = "Đang hoạt động";
                 newAccount.Avatar = register.Avatar;
                 newAccount.RoleId = 2;
-                newAccount.Password = GenerateRandomString();
+                newAccount.Password = BCrypt.Net.BCrypt.HashPassword(GenerateRandomString());
+                //newAccount.Password = GenerateRandomString();
                 _context.Accounts.Add(newAccount);
                 _context.SaveChanges();
                 string token = "";
@@ -139,7 +142,7 @@ namespace backend.Repositories.UserRepository
                     message = "The account is not found"
                 };
             }
-            if (user.Password != password)
+            if (!BCrypt.Net.BCrypt.Verify(password, user.Password))
             {
                 return new
                 {
@@ -164,7 +167,7 @@ namespace backend.Repositories.UserRepository
                 };
             }
             token = CreateToken(user.Email, (int)user.RoleId, config);
-            if (user.Email == email && user.Password == password && user.Status.Equals("Đang hoạt động"))
+            if (user.Email == email && BCrypt.Net.BCrypt.Verify(password, user.Password) && user.Status.Equals("Đang hoạt động"))
             {
                 return new
                 {
@@ -199,14 +202,16 @@ namespace backend.Repositories.UserRepository
                 account.Avatar = register.Avatar;
             }
             account.RoleId = 2;
-            account.Password = GenerateRandomString();
+            var unencryptedPassword = GenerateRandomString();
+            account.Password = BCrypt.Net.BCrypt.HashPassword(unencryptedPassword);
+            //account.Password = GenerateRandomString();
             _context.Accounts.Add(account);
             _context.SaveChanges();
             if (account.Status.Equals("Chờ xác thực"))
             {
                 try
                 {
-                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, account.Email, account.Password);
+                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, account.Email, unencryptedPassword);
                 }
                 catch
                 {
@@ -306,7 +311,8 @@ namespace backend.Repositories.UserRepository
             }
             else
             {
-                account.Password = newPassword;
+                //account.Password = newPassword;
+                account.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
                 _context.SaveChanges();
                 return new
                 {
@@ -441,44 +447,6 @@ namespace backend.Repositories.UserRepository
                 };
             }
         }
-
-        //public object WeekLyActivity(int accountId)
-        //{
-        //    try
-        //    {
-        //        //DateTime inputDate = DateTime.Now;
-        //        DateTime inputDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-        //        DateTime sunday = GetSundayOfWeek(inputDate);
-        //        DateTime monday = sunday.AddDays(-6);
-        //        var testDetailByAccountId = _context.Testdetails.Where(x => x.AccountId == accountId && x.Submitted == true);
-        //        var testCount = testDetailByAccountId.Count();
-        //        float totalScore = 0;
-        //        foreach (var test in testDetailByAccountId)
-        //        {
-        //            if (test.CreateDate.HasValue && test.CreateDate.Value.Date >= monday && test.CreateDate.Value.Date <= sunday)
-        //            {
-        //                totalScore += (float)test.Score;
-        //            }
-        //        }
-        //        var avarage = Math.Round((totalScore / testCount), 1);
-        //        return new
-        //        {
-        //            message = "Get Successfully",
-        //            status = 200,
-        //            countTest = testCount,
-        //            totalScore = avarage,
-        //        };
-        //    }
-        //    catch
-        //    {
-        //        return new
-        //        {
-        //            message = "Get Failly",
-        //            status = 400,
-        //        };
-        //    }
-
-        //}
 
         public DateTime GetSundayOfWeek(DateTime date)
         {
