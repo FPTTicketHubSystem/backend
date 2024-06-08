@@ -127,10 +127,7 @@
                                         <tr>
                                             <td align=""left"" bgcolor=""#ffffff"" style=""padding: 24px; font-size: 16px; line-height: 24px;"">
                                                 <p style=""margin: 0;"">Dear {fullname}, <br />
-                                                    Chúng tôi nhận được yêu cầu đăng ký của bạn, đây là thông tin tài khoản và mật khẩu của bạn:<br /><br />
-                                                    Tài khoản: <strong>{email}</strong><br />
-                                                    Mật khẩu: <strong>{password}</strong><br />
-                                                    Không chia sẻ mật khẩu với bất kỳ ai. Vui lòng đổi mật khẩu sau khi nhận được email này. <br /><br />
+                                                    Chúng tôi nhận được yêu cầu đăng ký của bạn với email {email}<br /><br />
                                                     Bấm nút xác thực bên dưới để xác nhận tài khoản.<br />
                                                     <a href=""http://localhost:3000/confirmaccount/{email}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
                                                     Chúc bạn có trải nghiệm tốt.
@@ -280,9 +277,6 @@
                 </head>
 
                 <body style='background-color: #e9ecef;'>
-                    <div class='preheader'>
-                        This is a preheader text.
-                    </div>
                     <table border='0' cellpadding='0' cellspacing='0' width='100%'>
                         <tr>
                             <td align='center' bgcolor='#e9ecef'>

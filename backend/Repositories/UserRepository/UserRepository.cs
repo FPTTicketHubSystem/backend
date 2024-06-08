@@ -202,8 +202,8 @@ namespace backend.Repositories.UserRepository
                 account.Avatar = register.Avatar;
             }
             account.RoleId = 2;
-            var unencryptedPassword = GenerateRandomString();
-            account.Password = BCrypt.Net.BCrypt.HashPassword(unencryptedPassword);
+            //var unencryptedPassword = GenerateRandomString();
+            account.Password = BCrypt.Net.BCrypt.HashPassword(register.Password);
             //account.Password = GenerateRandomString();
             _context.Accounts.Add(account);
             _context.SaveChanges();
@@ -211,7 +211,7 @@ namespace backend.Repositories.UserRepository
             {
                 try
                 {
-                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, account.Email, unencryptedPassword);
+                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, account.Email, account.Password);
                 }
                 catch
                 {

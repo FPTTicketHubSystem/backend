@@ -63,9 +63,11 @@ public partial class FpttickethubContext : DbContext
         {
             entity.ToTable("ACCOUNT");
 
-            entity.HasIndex(e => e.Email, "UK_Email").IsUnique();
+            entity.HasIndex(e => e.Phone, "IX_UniquePhone")
+                .IsUnique()
+                .HasFilter("([Phone] IS NOT NULL)");
 
-            entity.HasIndex(e => e.Phone, "UK_Phone").IsUnique();
+            entity.HasIndex(e => e.Email, "UK_Email").IsUnique();
 
             entity.Property(e => e.Avatar).IsUnicode(false);
             entity.Property(e => e.BirthDay).HasColumnType("date");
