@@ -7,15 +7,17 @@ public partial class Event
 {
     public int EventId { get; set; }
 
-    public int AccountId { get; set; }
+    public int? AccountId { get; set; }
 
-    public int CategoryId { get; set; }
+    public int? CategoryId { get; set; }
 
     public string? EventName { get; set; }
 
     public string? ThemeImage { get; set; }
 
     public string? EventDescription { get; set; }
+
+    public string? Address { get; set; }
 
     public string? Location { get; set; }
 
@@ -27,9 +29,9 @@ public partial class Event
 
     public string? Status { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; }
 
-    public virtual Category Category { get; set; } = null!;
+    public virtual Category? Category { get; set; }
 
     public virtual ICollection<Discountcode> Discountcodes { get; set; } = new List<Discountcode>();
 
@@ -38,4 +40,6 @@ public partial class Event
     public virtual ICollection<Eventrating> Eventratings { get; set; } = new List<Eventrating>();
 
     public virtual ICollection<Eventstaff> Eventstaffs { get; set; } = new List<Eventstaff>();
+
+    public virtual ICollection<Tickettype> Tickettypes { get; set; } = new List<Tickettype>();
 }

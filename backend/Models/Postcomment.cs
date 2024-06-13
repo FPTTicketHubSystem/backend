@@ -7,9 +7,9 @@ public partial class Postcomment
 {
     public int PostCommentId { get; set; }
 
-    public int AccountId { get; set; }
+    public int? AccountId { get; set; }
 
-    public int PostId { get; set; }
+    public int? PostId { get; set; }
 
     public string? Content { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Postcomment
 
     public string? Status { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; }
 
-    public virtual Post Post { get; set; } = null!;
+    public virtual Post? Post { get; set; }
 }

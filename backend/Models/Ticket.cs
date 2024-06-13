@@ -7,9 +7,9 @@ public partial class Ticket
 {
     public int TicketId { get; set; }
 
-    public int OrderDetailId { get; set; }
+    public int? OrderDetailId { get; set; }
 
-    public int TicketTypeId { get; set; }
+    public int? TicketTypeId { get; set; }
 
     public string? TicketCode { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Ticket
 
     public DateTime? CheckInDate { get; set; }
 
-    public virtual Orderdetail OrderDetail { get; set; } = null!;
+    public virtual Orderdetail? OrderDetail { get; set; }
 
-    public virtual Tickettype TicketType { get; set; } = null!;
+    public virtual Tickettype? TicketType { get; set; }
 }

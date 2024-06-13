@@ -7,7 +7,7 @@ public partial class Post
 {
     public int PostId { get; set; }
 
-    public int AccountId { get; set; }
+    public int? AccountId { get; set; }
 
     public string? PostText { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Post
 
     public string? Status { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; }
 
     public virtual ICollection<Postcomment> Postcomments { get; set; } = new List<Postcomment>();
 

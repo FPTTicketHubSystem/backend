@@ -1,5 +1,7 @@
 using backend.Models;
+using backend.Repositories.EventRepository;
 using backend.Repositories.UserRepository;
+using backend.Services.EventService;
 using backend.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -7,6 +9,16 @@ using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.ListenAnyIP(5000); // HTTP
+//    serverOptions.ListenAnyIP(5001, listenOptions =>
+//    {
+//        listenOptions.UseHttps(); // HTTPS
+//    });
+//});
+
 
 // Add services to the container.
 builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
@@ -45,6 +57,8 @@ services.AddHttpContextAccessor();
 
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IUserService, UserService>();
+services.AddScoped<IEventRepository, EventRepository>();
+services.AddScoped<IEventService, EventService>();
 
 var app = builder.Build();
 

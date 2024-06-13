@@ -7,7 +7,7 @@ public partial class Orderdetail
 {
     public int OrderDetailId { get; set; }
 
-    public int OrderId { get; set; }
+    public int? OrderId { get; set; }
 
     public DateTime? OrderDate { get; set; }
 
@@ -17,7 +17,7 @@ public partial class Orderdetail
 
     public string? Phone { get; set; }
 
-    public virtual Order Order { get; set; } = null!;
+    public virtual Order? Order { get; set; }
 
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

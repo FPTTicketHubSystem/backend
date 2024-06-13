@@ -88,7 +88,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Role).WithMany(p => p.Accounts)
                 .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ACCOUNT_ROLE");
         });
 
@@ -111,12 +110,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Discountcodes)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DISCOUNTCODE_ACCOUNT");
 
             entity.HasOne(d => d.Event).WithMany(p => p.Discountcodes)
                 .HasForeignKey(d => d.EventId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_DISCOUNTCODE_EVENT");
         });
 
@@ -124,6 +121,7 @@ public partial class FpttickethubContext : DbContext
         {
             entity.ToTable("EVENT");
 
+            entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.EndTime).HasColumnType("datetime");
             entity.Property(e => e.Location).HasMaxLength(200);
             entity.Property(e => e.StartTime).HasColumnType("datetime");
@@ -132,12 +130,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Events)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EVENT_ACCOUNT");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Events)
                 .HasForeignKey(d => d.CategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EVENT_CATEGORY");
         });
 
@@ -152,7 +148,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Event).WithMany(p => p.Eventimages)
                 .HasForeignKey(d => d.EventId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EVENTIMAGE_EVENT");
         });
 
@@ -168,12 +163,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Eventratings)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EVENTRATING_ACCOUNT");
 
             entity.HasOne(d => d.Event).WithMany(p => p.Eventratings)
                 .HasForeignKey(d => d.EventId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_EVENTRATING_EVENT");
         });
 
@@ -205,7 +198,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.News)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_NEWS_ACCOUNT");
         });
 
@@ -219,7 +211,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ORDER_ACCOUNT");
         });
 
@@ -238,7 +229,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ORDERDETAIL_ORDER");
         });
 
@@ -256,12 +246,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.OrderId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PAYMENT_ORDER");
 
             entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.PaymentMethodId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_PAYMENT_PAYMENTMETHOD");
         });
 
@@ -283,7 +271,6 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Posts)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POST_ACCOUNT");
         });
 
@@ -298,12 +285,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Postcomments)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTCOMMENT_ACCOUNT");
 
             entity.HasOne(d => d.Post).WithMany(p => p.Postcomments)
                 .HasForeignKey(d => d.PostId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTCOMMENT_POST");
         });
 
@@ -315,12 +300,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Postfavorites)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTFAVORITE_ACCOUNT");
 
             entity.HasOne(d => d.Post).WithMany(p => p.Postfavorites)
                 .HasForeignKey(d => d.PostId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTFAVORITE_POST");
         });
 
@@ -333,12 +316,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.Account).WithMany(p => p.Postlikes)
                 .HasForeignKey(d => d.AccountId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTLIKE_ACCOUNT");
 
             entity.HasOne(d => d.Post).WithMany(p => p.Postlikes)
                 .HasForeignKey(d => d.PostId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_POSTLIKE_POST");
         });
 
@@ -360,12 +341,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.HasOne(d => d.OrderDetail).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.OrderDetailId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TICKET_ORDERDETAIL");
 
             entity.HasOne(d => d.TicketType).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.TicketTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_TICKET_TICKETTYPE");
         });
 
@@ -376,6 +355,10 @@ public partial class FpttickethubContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Status).HasMaxLength(100);
             entity.Property(e => e.TypeName).HasMaxLength(100);
+
+            entity.HasOne(d => d.Event).WithMany(p => p.Tickettypes)
+                .HasForeignKey(d => d.EventId)
+                .HasConstraintName("FK_TICKETTYPE_EVENT");
         });
 
         OnModelCreatingPartial(modelBuilder);
