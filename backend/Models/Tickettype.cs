@@ -7,7 +7,7 @@ public partial class Tickettype
 {
     public int TicketTypeId { get; set; }
 
-    public int EventId { get; set; }
+    public int? EventId { get; set; }
 
     public string? TypeName { get; set; }
 
@@ -16,6 +16,8 @@ public partial class Tickettype
     public int? Quantity { get; set; }
 
     public string? Status { get; set; }
+
+    public virtual Event? Event { get; set; }
 
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

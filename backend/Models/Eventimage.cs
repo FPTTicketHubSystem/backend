@@ -7,11 +7,11 @@ public partial class Eventimage
 {
     public int EventImageId { get; set; }
 
-    public int EventId { get; set; }
+    public int? EventId { get; set; }
 
     public string? ImageUrl { get; set; }
 
     public string? Status { get; set; }
 
-    public virtual Event Event { get; set; } = null!;
+    public virtual Event? Event { get; set; }
 }

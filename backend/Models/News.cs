@@ -7,7 +7,7 @@ public partial class News
 {
     public int NewsId { get; set; }
 
-    public int AccountId { get; set; }
+    public int? AccountId { get; set; }
 
     public string? Title { get; set; }
 
@@ -19,5 +19,5 @@ public partial class News
 
     public string? Status { get; set; }
 
-    public virtual Account Account { get; set; } = null!;
+    public virtual Account? Account { get; set; }
 }
