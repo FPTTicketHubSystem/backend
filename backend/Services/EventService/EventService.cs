@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using backend.Models;
 using backend.Repositories.EventRepository;
+using MimeKit.Encodings;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace backend.Services.EventService
 {
@@ -14,11 +16,38 @@ namespace backend.Services.EventService
             _eventRepository = eventRepository;
         }
 
+        public async Task<object> GetAllEvent()
+        {
+            return await _eventRepository.GetAllEvent();
+        }
 
         public object AddEvent(EventDTO newEvent)
         {
             var result = _eventRepository.AddEvent(newEvent);
             return result;
+        }
+
+        public object EditEvent(int eventId, EventDTO updatedEventDto)
+        {
+            var result = _eventRepository.EditEvent(eventId, updatedEventDto);
+            return result;
+        }
+
+        public object GetEventById (int eventId)
+        {
+            var result = _eventRepository.GetEventById(eventId);
+            return result;
+        }
+
+        public object GetEventByCategory (int categoryId)
+        {
+            var result = _eventRepository.GetEventByCategory(categoryId);
+            return result;
+        }
+
+        public async Task<object> GetUpcomingEvent()
+        {
+            return await _eventRepository.GetUpcomingEvent();
         }
 
     }

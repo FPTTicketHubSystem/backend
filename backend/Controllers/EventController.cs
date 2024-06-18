@@ -17,6 +17,21 @@ namespace backend.Controllers
             _eventService = eventService;
         }
 
+        //GET: api/event
+        [HttpGet("getAllEvent")]
+        public async Task<ActionResult> GetAllEvent()
+        {
+            try
+            {
+                var data = await _eventService.GetAllEvent();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
 
         // POST: api/event
         [HttpPost("addEvent")]
@@ -33,5 +48,58 @@ namespace backend.Controllers
             }
         }
 
+        // POST: api/event
+        [HttpPost("editEvent")]
+        public async Task<ActionResult> EditEvent(int eventId, EventDTO updatedEventDto)
+        {
+            try
+            {
+                var result = _eventService.EditEvent(eventId, updatedEventDto);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        // GET: api/event 
+        [HttpGet("getEventById")]
+        public async Task<ActionResult> GetEventById(int eventId)
+        {
+            try
+            {
+                var data = _eventService.GetEventById(eventId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        // GET: api/event
+        [HttpGet("getEventByCategory")]
+        public async Task<ActionResult> GetEventByCategory(int categoryId)
+        {
+            try
+            {
+                var data = _eventService.GetEventByCategory(categoryId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        //GET: api/event
+        [HttpGet("getUpcomingEvent")]
+        public async Task<ActionResult> GetUpcomingEvent()
+        {
+            try
+            {
+                var data = await _eventService.GetUpcomingEvent();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }
