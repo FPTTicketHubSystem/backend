@@ -6,7 +6,11 @@ namespace backend.Repositories.EventRepository
 {
     public interface IEventRepository
     {
+        Task<object> GetAllEvent();
         object AddEvent(EventDTO newEventDto);
-
+        object EditEvent(int eventId, EventDTO updatedEventDto);
+        object GetEventById(int eventId);
+        object GetEventByCategory(int categoryId);
+        Task<object> GetUpcomingEvent();
     }
 }
