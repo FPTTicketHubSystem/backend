@@ -204,9 +204,27 @@ namespace backend.Repositories.EventRepository
         {
             var data = _context.Events
                 .Include(e => e.Eventratings)
-                .Include(e=> e.Tickettypes)
-                .Include(e=> e.Discountcodes)
-                .FirstOrDefault(e => e.EventId == eventId);
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Discountcodes)
+                .Where(e => e.EventId == eventId)
+                .Select(e =>
+                new
+                {
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.Account.BirthDay,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                }).SingleOrDefault();
             if (data == null)
             {
                 return null;
