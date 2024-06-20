@@ -372,7 +372,7 @@ namespace backend.Repositories.UserRepository
 
         public object GetAllAccountUser()
         {
-            var userList = _context.Accounts.Where(x => x.RoleId == 4).OrderByDescending(x => x.AccountId);
+            var userList = _context.Accounts.Where(x => x.RoleId != 1).OrderByDescending(x => x.AccountId);
             if (userList == null)
             {
                 return new
