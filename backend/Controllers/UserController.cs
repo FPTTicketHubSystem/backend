@@ -91,6 +91,20 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+        [HttpGet("getAllAccountUser")]
+        public async Task<ActionResult> GetAllAccountUser()
+        {
+            try
+            {
+                var users = _userService.GetAllAccountUser();
+                return Ok(users);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
 
     }
 }
