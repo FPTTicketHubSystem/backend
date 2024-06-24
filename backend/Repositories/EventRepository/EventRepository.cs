@@ -44,6 +44,40 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
+        public async Task<object> GetEventByAccount(int accountId)
+        {
+            var data = _context.Events
+                .Include(e => e.Category)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Account)
+                .Where(e => e.AccountId == accountId)
+                .OrderByDescending(e => e.StartTime)
+                .Select(e =>
+                new
+                {
+                    e.Account.AccountId,
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Status
+                });
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
+        }
+
         public object AddEvent(EventDTO newEventDto)
         {
             try
@@ -114,6 +148,38 @@ namespace backend.Repositories.EventRepository
                     status = 400
                 };
             }
+        }
+
+        public object GetEventForEdit(int eventId)
+        {
+            var data = _context.Events
+                .Include(e => e.Eventratings)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Discountcodes)
+                .Where(e => e.EventId == eventId)
+                .Select(e =>
+                new
+                {
+                    e.AccountId,
+                    e.CategoryId,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.TicketQuantity,
+                    e.Status,
+                    e.Eventimages,
+                    e.Tickettypes,
+                    e.Discountcodes,
+                }).SingleOrDefault();
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
         }
 
         public object EditEvent(int eventId, EventDTO updatedEventDto)
@@ -200,13 +266,31 @@ namespace backend.Repositories.EventRepository
             }
         }
 
-        public object GetEventById (int eventId)
+        public object GetEventById(int eventId)
         {
             var data = _context.Events
                 .Include(e => e.Eventratings)
-                .Include(e=> e.Tickettypes)
-                .Include(e=> e.Discountcodes)
-                .FirstOrDefault(e => e.EventId == eventId);
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Discountcodes)
+                .Where(e => e.EventId == eventId)
+                .Select(e =>
+                new
+                {
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.Account.BirthDay,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                }).SingleOrDefault();
             if (data == null)
             {
                 return null;
@@ -214,7 +298,7 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public object GetEventByCategory (int categoryId)
+        public object GetEventByCategory(int categoryId)
         {
             var data = _context.Events
                 .Include(e => e.Tickettypes)
@@ -235,7 +319,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .Where(e => e.Status == "Đã duyệt" && e.StartTime > DateTime.Now)
+                .Where(e => e.Status == "Đã duyệt")
                 .OrderByDescending(e => e.StartTime)
                 .Take(5)
                 .Select(e =>
@@ -261,8 +345,5 @@ namespace backend.Repositories.EventRepository
 
             return data;
         }
-
-
-
     }
 }
