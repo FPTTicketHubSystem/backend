@@ -1,5 +1,7 @@
 using backend.Models;
+using backend.Repositories.CategoryRepository;
 using backend.Repositories.UserRepository;
+using backend.Services.CategoryService;
 using backend.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -45,6 +47,8 @@ services.AddHttpContextAccessor();
 
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IUserService, UserService>();
+services.AddScoped<ICategoryRepository, CategoryRepository>();
+services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 

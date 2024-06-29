@@ -7,7 +7,7 @@ using System.Data;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
@@ -66,7 +66,7 @@ namespace backend.Controllers
 
             return NoContent();
         }
-
+         
         // POST: api/Categories
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category category)
