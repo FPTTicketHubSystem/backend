@@ -44,6 +44,36 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
+        public async Task<object> GetAllEventAdmin()
+        {
+            var data = _context.Events
+                .Include(e => e.Category)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Account)
+                .Where(e => e.Status != "Nháp")
+                .OrderByDescending(e => e.StartTime)
+                .Select(e =>
+                new
+                {
+                    e.Account.AccountId,
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Status
+                });
+            return data;
+        }
+
         public object AddEvent(EventDTO newEventDto)
         {
             try

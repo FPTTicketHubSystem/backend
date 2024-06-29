@@ -21,6 +21,11 @@ namespace backend.Services.EventService
             return await _eventRepository.GetAllEvent();
         }
 
+        public async Task<object> GetAllEventAdmin()
+        {
+            return await _eventRepository.GetAllEventAdmin();
+        }
+
         public object AddEvent(EventDTO newEvent)
         {
             var result = _eventRepository.AddEvent(newEvent);

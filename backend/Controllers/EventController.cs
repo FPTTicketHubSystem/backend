@@ -32,6 +32,21 @@ namespace backend.Controllers
             }
         }
 
+        //GET: api/event
+        [HttpGet("getAllEventAdmin")]
+        public async Task<ActionResult> GetAllEventAdmin()
+        {
+            try
+            {
+                var data = await _eventService.GetAllEventAdmin();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
 
         // POST: api/event
         [HttpPost("addEvent")]

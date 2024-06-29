@@ -7,6 +7,7 @@ namespace backend.Repositories.EventRepository
     public interface IEventRepository
     {
         Task<object> GetAllEvent();
+        Task<object> GetAllEventAdmin();
         object AddEvent(EventDTO newEventDto);
         object EditEvent(int eventId, EventDTO updatedEventDto);
         object GetEventById(int eventId);
