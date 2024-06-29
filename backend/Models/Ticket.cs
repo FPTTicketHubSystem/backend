@@ -9,10 +9,6 @@ public partial class Ticket
 
     public int? OrderDetailId { get; set; }
 
-    public int? TicketTypeId { get; set; }
-
-    public string? TicketCode { get; set; }
-
     public string? Status { get; set; }
 
     public bool? IsCheckedIn { get; set; }
@@ -20,6 +16,4 @@ public partial class Ticket
     public DateTime? CheckInDate { get; set; }
 
     public virtual Orderdetail? OrderDetail { get; set; }
-
-    public virtual Tickettype? TicketType { get; set; }
 }

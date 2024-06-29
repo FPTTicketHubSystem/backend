@@ -9,6 +9,8 @@ public partial class News
 
     public int? AccountId { get; set; }
 
+    public string? CoverImage { get; set; }
+
     public string? Title { get; set; }
 
     public string? Subtitle { get; set; }

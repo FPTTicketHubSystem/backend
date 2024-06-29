@@ -77,11 +77,11 @@ namespace backend.Controllers
 
         // POST: api/event
         [HttpPost("editEvent")]
-        public async Task<ActionResult> EditEvent(int eventId, EventDTO updatedEventDto)
+        public async Task<ActionResult> EditEvent(EventDTO updatedEventDto)
         {
             try
             {
-                var result = _eventService.EditEvent(eventId, updatedEventDto);
+                var result = _eventService.EditEvent(updatedEventDto);
                 return Ok(result);
             }
             catch

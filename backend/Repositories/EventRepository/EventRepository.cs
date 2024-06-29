@@ -93,7 +93,6 @@ namespace backend.Repositories.EventRepository
                     Location = newEventDto.Location,
                     StartTime = newEventDto.StartTime,
                     EndTime = newEventDto.EndTime,
-                    TicketQuantity = newEventDto.TicketQuantity,
                     Status = newEventDto.Status,
                 };
 
@@ -160,6 +159,7 @@ namespace backend.Repositories.EventRepository
                 .Select(e =>
                 new
                 {
+                    e.EventId,
                     e.AccountId,
                     e.CategoryId,
                     e.EventName,
@@ -169,7 +169,6 @@ namespace backend.Repositories.EventRepository
                     e.Location,
                     e.StartTime,
                     e.EndTime,
-                    e.TicketQuantity,
                     e.Status,
                     e.Eventimages,
                     e.Tickettypes,
@@ -182,11 +181,11 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public object EditEvent(int eventId, EventDTO updatedEventDto)
+        public object EditEvent(EventDTO updatedEventDto)
         {
             try
             {
-                var existingEvent = _context.Events.FirstOrDefault(e => e.EventId == eventId);
+                var existingEvent = _context.Events.FirstOrDefault(e => e.EventId == updatedEventDto.EventId);
 
                 if (existingEvent == null)
                 {
@@ -206,26 +205,25 @@ namespace backend.Repositories.EventRepository
                 existingEvent.Location = updatedEventDto.Location;
                 existingEvent.StartTime = updatedEventDto.StartTime;
                 existingEvent.EndTime = updatedEventDto.EndTime;
-                existingEvent.TicketQuantity = updatedEventDto.TicketQuantity;
                 existingEvent.Status = updatedEventDto.Status;
 
-                var existingEventImages = _context.Eventimages.Where(ei => ei.EventId == eventId).ToList();
+                var existingEventImages = _context.Eventimages.Where(ei => ei.EventId == updatedEventDto.EventId).ToList();
                 _context.Eventimages.RemoveRange(existingEventImages);
 
                 var updatedEventImages = updatedEventDto.EventImages.Select(imageDto => new Eventimage
                 {
-                    EventId = eventId,
+                    EventId = updatedEventDto.EventId,
                     ImageUrl = imageDto.ImageUrl,
                     Status = ""
                 }).ToList();
                 _context.Eventimages.AddRange(updatedEventImages);
 
-                var existingTicketTypes = _context.Tickettypes.Where(tt => tt.EventId == eventId).ToList();
+                var existingTicketTypes = _context.Tickettypes.Where(tt => tt.EventId == updatedEventDto.EventId).ToList();
                 _context.Tickettypes.RemoveRange(existingTicketTypes);
 
                 var updatedTicketTypes = updatedEventDto.TicketTypes.Select(ticketTypeDto => new Tickettype
                 {
-                    EventId = eventId,
+                    EventId = updatedEventDto.EventId,
                     TypeName = ticketTypeDto.TypeName,
                     Price = ticketTypeDto.Price,
                     Quantity = ticketTypeDto.Quantity,
@@ -233,13 +231,13 @@ namespace backend.Repositories.EventRepository
                 }).ToList();
                 _context.Tickettypes.AddRange(updatedTicketTypes);
 
-                var existingDiscountCodes = _context.Discountcodes.Where(dc => dc.EventId == eventId).ToList();
+                var existingDiscountCodes = _context.Discountcodes.Where(dc => dc.EventId == updatedEventDto.EventId).ToList();
                 _context.Discountcodes.RemoveRange(existingDiscountCodes);
 
                 var updatedDiscountCodes = updatedEventDto.DiscountCodes.Select(discountCodeDto => new Discountcode
                 {
                     AccountId = updatedEventDto.AccountId,
-                    EventId = eventId,
+                    EventId = updatedEventDto.EventId,
                     Code = discountCodeDto.Code,
                     DiscountAmount = discountCodeDto.DiscountAmount,
                     Quantity = discountCodeDto.Quantity,

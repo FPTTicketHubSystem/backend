@@ -10,7 +10,7 @@ namespace backend.Repositories.EventRepository
         Task<object> GetEventByAccount(int accountId);
         object AddEvent(EventDTO newEventDto);
         object GetEventForEdit(int eventId);
-        object EditEvent(int eventId, EventDTO updatedEventDto);
+        object EditEvent(EventDTO updatedEventDto);
         object GetEventById(int eventId);
         object GetEventByCategory(int categoryId);
         Task<object> GetUpcomingEvent();
