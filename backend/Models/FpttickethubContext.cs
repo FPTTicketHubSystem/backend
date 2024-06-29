@@ -193,6 +193,7 @@ public partial class FpttickethubContext : DbContext
         {
             entity.ToTable("NEWS");
 
+            entity.Property(e => e.CoverImage).IsUnicode(false);
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Status).HasMaxLength(100);
 
@@ -218,18 +219,15 @@ public partial class FpttickethubContext : DbContext
         {
             entity.ToTable("ORDERDETAIL");
 
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.OrderDate).HasColumnType("datetime");
-            entity.Property(e => e.Phone)
-                .HasMaxLength(10)
-                .IsUnicode(false);
             entity.Property(e => e.Subtotal).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK_ORDERDETAIL_ORDER");
+
+            entity.HasOne(d => d.TicketType).WithMany(p => p.Orderdetails)
+                .HasForeignKey(d => d.TicketTypeId)
+                .HasConstraintName("FK_ORDERDETAIL_TICKETTYPE");
         });
 
         modelBuilder.Entity<Payment>(entity =>
@@ -337,15 +335,10 @@ public partial class FpttickethubContext : DbContext
 
             entity.Property(e => e.CheckInDate).HasColumnType("datetime");
             entity.Property(e => e.Status).HasMaxLength(100);
-            entity.Property(e => e.TicketCode).IsUnicode(false);
 
             entity.HasOne(d => d.OrderDetail).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.OrderDetailId)
                 .HasConstraintName("FK_TICKET_ORDERDETAIL");
-
-            entity.HasOne(d => d.TicketType).WithMany(p => p.Tickets)
-                .HasForeignKey(d => d.TicketTypeId)
-                .HasConstraintName("FK_TICKET_TICKETTYPE");
         });
 
         modelBuilder.Entity<Tickettype>(entity =>

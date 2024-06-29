@@ -38,9 +38,9 @@ namespace backend.Services.EventService
             return result;
         }
 
-        public object EditEvent(int eventId, EventDTO updatedEventDto)
+        public object EditEvent(EventDTO updatedEventDto)
         {
-            var result = _eventRepository.EditEvent(eventId, updatedEventDto);
+            var result = _eventRepository.EditEvent(updatedEventDto);
             return result;
         }
 

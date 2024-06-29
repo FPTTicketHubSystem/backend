@@ -1,7 +1,11 @@
 using backend.Models;
 using backend.Repositories.EventRepository;
+using backend.Repositories.EventStaffRepository;
+using backend.Repositories.NewsRepository;
 using backend.Repositories.UserRepository;
 using backend.Services.EventService;
+using backend.Services.EventStaffService;
+using backend.Services.NewsService;
 using backend.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -59,6 +63,10 @@ services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<IEventRepository, EventRepository>();
 services.AddScoped<IEventService, EventService>();
+services.AddScoped<IEventStaffRepository, EventStaffRepository>();
+services.AddScoped<IEventStaffService, EventStaffService>();
+services.AddScoped<INewsRepository, NewsRepository>();
+services.AddScoped<INewsService, NewsService>();
 
 var app = builder.Build();
 
