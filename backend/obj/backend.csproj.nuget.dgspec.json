@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Summer2024\\SEP490\\source\\sourcecode\\FPTTicketHub\\backend\\backend\\backend.csproj": {}
+    "D:\\CapstoneProject\\backend\\backend\\backend.csproj": {}
   },
   "projects": {
-    "D:\\Summer2024\\SEP490\\source\\sourcecode\\FPTTicketHub\\backend\\backend\\backend.csproj": {
+    "D:\\CapstoneProject\\backend\\backend\\backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Summer2024\\SEP490\\source\\sourcecode\\FPTTicketHub\\backend\\backend\\backend.csproj",
+        "projectUniqueName": "D:\\CapstoneProject\\backend\\backend\\backend.csproj",
         "projectName": "backend",
-        "projectPath": "D:\\Summer2024\\SEP490\\source\\sourcecode\\FPTTicketHub\\backend\\backend\\backend.csproj",
-        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
-        "outputPath": "D:\\Summer2024\\SEP490\\source\\sourcecode\\FPTTicketHub\\backend\\backend\\obj\\",
+        "projectPath": "D:\\CapstoneProject\\backend\\backend\\backend.csproj",
+        "packagesPath": "C:\\Users\\Acer\\.nuget\\packages\\",
+        "outputPath": "D:\\CapstoneProject\\backend\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Acer\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Users\\nguye\\.nuget\\packages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -35,12 +35,25 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "MailKit": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.13, )"
@@ -55,9 +68,17 @@
               "target": "Package",
               "version": "[7.0.10, )"
             },
+            "MimeKit": {
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
+            },
+            "Swashbuckle.AspNetCore.Filters": {
+              "target": "Package",
+              "version": "[8.0.2, )"
             }
           },
           "imports": [
@@ -79,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

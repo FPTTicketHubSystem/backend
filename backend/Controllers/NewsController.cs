@@ -17,7 +17,7 @@ namespace backend.Controllers
         }
 
         //GET: api/news
-        [HttpGet("getAllNews")]
+        /*[HttpGet("getAllNews")]
         public async Task<ActionResult> GetAllNews()
         {
             try
@@ -29,7 +29,34 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
+        }*/
+        [HttpGet("getAllNews")]
+        public async Task<ActionResult> GetAllNews([FromQuery] string status = "")
+        {
+            try
+            {
+                var data = await _newService.GetAllNews(status);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
+
+        /*[HttpGet("getAllNews")]
+        public async Task<ActionResult> GetAllNews()
+        {
+            try
+            {
+                var result = _newService.GetAllNews();
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }*/
 
         //GET: api/news
         [HttpGet("getNewsByAccount")]
@@ -61,7 +88,25 @@ namespace backend.Controllers
             }
         }
 
-        // GET: api/news 
+        [HttpGet("getNewsById/{newsId}")]
+        public async Task<ActionResult> GetNewsById(int newsId)
+        {
+            try
+            {
+                var news = await _newService.GetNewsById(newsId);
+                if (news == null)
+                {
+                    return NotFound();
+                }
+                return Ok(news);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        /*// GET: api/news 
         [HttpGet("getNewsById")]
         public async Task<ActionResult> GetNewsById(int newsId)
         {
@@ -71,16 +116,55 @@ namespace backend.Controllers
                 return Ok(data);
             }
             catch { return BadRequest(); }
-        }
+        }*/
 
-        //GET: api/news
-        [HttpGet("getLastestNews")]
-        public async Task<ActionResult> GetLastestNews()
+        /*        //GET: api/news
+                [HttpGet("getLastestNews")]
+                public async Task<ActionResult> GetLastestNews()
+                {
+                    try
+                    {
+                        var data = await _newService.GetLastestNews();
+                        return Ok(data);
+                    }
+                    catch
+                    {
+                        return BadRequest();
+                    }
+                }*/
+        [HttpPost("changeStatusNews")]
+        public async Task<ActionResult> ChangeStatusNews(int newsId, string status)
         {
             try
             {
-                var data = await _newService.GetLastestNews();
-                return Ok(data);
+                var result = _newService.ChangeStatusNews(newsId, status);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("displayNewDetail")]
+        public async Task<ActionResult> DisplayNewDetail(int newsId)
+        {
+            try
+            {
+                var result = _newService.GetNewDetail(newsId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("getNewsInPage")]
+        public async Task<ActionResult> GetNewsInPage(int page = 1, int pageSize = 3)
+        {
+            try
+            {
+                var result = _newService.GetNewsByPage(page, pageSize);
+                return Ok(result);
             }
             catch
             {
