@@ -4,11 +4,15 @@ using backend.Repositories.EventStaffRepository;
 using backend.Repositories.NewsRepository;
 using backend.Repositories.StatisticRepository;
 using backend.Repositories.UserRepository;
+using backend.Repositories.EventRepository;
+using backend.Repositories.ForumRepository;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
 using backend.Services.NewsService;
 using backend.Services.StatisticService;
 using backend.Services.UserService;
+using backend.Services.EventService;
+using backend.Services.ForumService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -71,6 +75,8 @@ services.AddScoped<INewsRepository, NewsRepository>();
 services.AddScoped<INewsService, NewsService>();
 services.AddScoped<IStatisticRepository, StatisticRepository>();
 services.AddScoped<IStatisticService, StatisticService>();
+services.AddScoped<IForumRepository, ForumRepository>();
+services.AddScoped<IForumService, ForumService>();
 
 var app = builder.Build();
 
