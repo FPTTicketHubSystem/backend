@@ -25,8 +25,6 @@ public partial class Event
 
     public DateTime? EndTime { get; set; }
 
-    public int? TicketQuantity { get; set; }
-
     public string? Status { get; set; }
 
     public virtual Account? Account { get; set; }

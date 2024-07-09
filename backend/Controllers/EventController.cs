@@ -33,6 +33,21 @@ namespace backend.Controllers
             }
         }
 
+        //GET: api/event
+        [HttpGet("getEventByAccount")]
+        public async Task<ActionResult> GetEventByAccount(int accountId)
+        {
+            try
+            {
+                var data = await _eventService.GetEventByAccount(accountId);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
 
         // POST: api/event
         [HttpPost("addEvent")]
@@ -49,13 +64,25 @@ namespace backend.Controllers
             }
         }
 
-        // POST: api/event
-        [HttpPost("editEvent")]
-        public async Task<ActionResult> EditEvent(int eventId, EventDTO updatedEventDto)
+        // GET: api/event 
+        [HttpGet("getEventForEdit")]
+        public async Task<ActionResult> GetEventForEdit(int eventId)
         {
             try
             {
-                var result = _eventService.EditEvent(eventId, updatedEventDto);
+                var data = _eventService.GetEventForEdit(eventId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        // POST: api/event
+        [HttpPost("editEvent")]
+        public async Task<ActionResult> EditEvent(EventDTO updatedEventDto)
+        {
+            try
+            {
+                var result = _eventService.EditEvent(updatedEventDto);
                 return Ok(result);
             }
             catch
