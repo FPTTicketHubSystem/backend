@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using backend.DTOs;
 using backend.Models;
 using backend.Services.EventService;
 using Microsoft.AspNetCore.Mvc;
