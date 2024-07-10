@@ -12,6 +12,10 @@ namespace backend.Services.NewsService
         {
             _newsRepository = newsRepository;
         }
+        public async Task<object> GetAllNewsAdmin(string status = "")
+        {
+            return await _newsRepository.GetAllNewsAdmin(status);
+        }
         public async Task<object> GetAllNews()
         {
             return await _newsRepository.GetAllNews();
@@ -25,14 +29,34 @@ namespace backend.Services.NewsService
             var result = _newsRepository.AddNews(newsDTO);
             return result;
         }
-        public object GetNewsById(int newsId)
+        /* public object GetNewsById(int newsId)
+         {
+             var result = _newsRepository.GetNewsById(newsId);
+             return result;
+         }*/
+        public Task<object> GetNewsById(int newsId)
         {
             var result = _newsRepository.GetNewsById(newsId);
             return result;
         }
-        public async Task<object> GetLastestNews()
+        /*        public object GetAllNewsInUserPage()
+                {
+                    return _newsRepository.GetAllNewsInUserPage();
+                }*/
+
+        public object GetNewDetail(int newsId)
         {
-            return await _newsRepository.GetLastestNews();
+            return _newsRepository.GetNewDetail(newsId);
+        }
+
+        public object GetNewsByPage(int page, int pageSize)
+        {
+            return _newsRepository.GetNewsByPage(page, pageSize);
+        }
+        public object ChangeStatusNews(int newsId, string status)
+        {
+            return _newsRepository.ChangeStatusNews(newsId, status);
         }
     }
 }
+

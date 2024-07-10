@@ -35,6 +35,32 @@ namespace backend.Repositories.NewsRepository
             return data;
         }
 
+        public async Task<object> GetAllNewsAdmin(string status = "")
+        {
+            var query = _context.News
+                .Include(n => n.Account)
+                .OrderByDescending(n => n.CreateDate)
+                .Select(n =>
+                new
+                {
+                    n.NewsId,
+                    n.Account.FullName,
+                    n.Account.Avatar,
+                    n.CoverImage,
+                    n.Title,
+                    n.Subtitle,
+                    n.Content,
+                    n.CreateDate,
+                    n.Status,
+                });
+            if (!string.IsNullOrEmpty(status))
+            {
+                query = query.Where(n => n.Status == status);
+            }
+
+            return await query.ToListAsync();
+        }
+
         public async Task<object> GetNewsByAccount(int accountId)
         {
             var data = _context.News
@@ -90,7 +116,7 @@ namespace backend.Repositories.NewsRepository
             }
         }
 
-        public object GetNewsById(int newsId)
+        /*public object GetNewsById(int newsId)
         {
             var data = _context.News
                 .Include(n => n.Account)
@@ -113,6 +139,26 @@ namespace backend.Repositories.NewsRepository
                 return null;
             }
             return data;
+        }*/
+        public async Task<object> GetNewsById(int newsId)
+        {
+            var news = await _context.News
+                .Include(n => n.Account)
+                .Where(n => n.NewsId == newsId)
+                .Select(n => new
+                {
+                    n.NewsId,
+                    n.Account.FullName,
+                    n.Account.Avatar,
+                    n.CoverImage,
+                    n.Title,
+                    n.Subtitle,
+                    n.Content,
+                    n.CreateDate,
+                    n.Status,
+                })
+                .FirstOrDefaultAsync();
+            return news;
         }
 
         public async Task<object> GetLastestNews()
@@ -141,6 +187,178 @@ namespace backend.Repositories.NewsRepository
             }
             return data;
         }
+        public List<OtherNews> OtherNews()
+        {
+            var otherNewsList = _context.News.Take(3).ToList();
+            List<OtherNews> otherNews = new List<OtherNews>();
 
+            foreach (var otherNewsItem in otherNewsList)
+            {
+                OtherNews other = new OtherNews();
+                other.NewsId = otherNewsItem.NewsId;
+
+                other.Title = otherNewsItem.Title;
+                other.Image = otherNewsItem.CoverImage;
+                other.SubTitle = otherNewsItem.Subtitle;
+                otherNews.Add(other);
+            }
+            return otherNews;
+        }
+        public object GetAllNewsInUserPage()
+        {
+            try
+            {
+                var firstNews = _context.News.OrderByDescending(x => x.NewsId).FirstOrDefault();
+                var firstNewsDTO = new FirstNews();
+                firstNewsDTO.NewsId = firstNews.NewsId;
+                firstNewsDTO.Title = firstNews.Title;
+                firstNewsDTO.Image = firstNews.CoverImage;
+                firstNewsDTO.CreatedDay = firstNews.CreateDate?.ToString("dd/MM/yyyy");
+                var dailyNews = DailyNews();
+                var otherNews = OtherNews();
+                return new
+                {
+                    message = "Get data successfully",
+                    status = 200,
+                    firstNew = firstNewsDTO,
+                    dailyNew = dailyNews,
+                    otherNew = otherNews,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Get data failed",
+                    status = 400,
+                };
+            }
+        }
+        public object EditNews(NewsDTO newsDTO)
+        {
+            var news = _context.News.SingleOrDefault(x => x.NewsId == newsDTO.NewsId);
+            if (news == null)
+            {
+                return new
+                {
+                    message = "Not found to return",
+                    status = 400,
+                };
+            }
+            news.Title = newsDTO.Title;
+            news.Subtitle = newsDTO.Subtitle;
+            news.CoverImage = newsDTO.CoverImage;
+            news.Content = newsDTO.Content;
+            _context.SaveChanges();
+            return new
+            {
+                message = "Edit Successfully",
+                status = 200,
+                data = news,
+            };
+        }
+        public object ChangeStatusNews(int newsId, string status)
+        {
+            var news = _context.News.FirstOrDefault(x => x.NewsId == newsId);
+            if (news == null)
+            {
+                return new
+                {
+                    message = "Not found to change",
+                    status = 400,
+                };
+            }
+            news.Status = status;
+            _context.SaveChanges();
+            return new
+            {
+                message = "Change status successfully",
+                status = 200,
+            };
+        }
+        public List<DailyNews> DailyNews()
+        {
+            var firstNews = _context.News.OrderByDescending(x => x.NewsId).FirstOrDefault();
+            var newsList = _context.News.Where(x => x.NewsId != firstNews.NewsId).OrderByDescending(x => x.NewsId).ToList();
+            List<DailyNews> dailyNews = new List<DailyNews>();
+            var count = 0;
+            foreach (var currentNews in newsList)
+            {
+                DailyNews news = new DailyNews();
+                news.NewsId = currentNews.NewsId;
+                count++;
+                if (count == 3)
+                {
+                    break;
+                }
+            }
+            return dailyNews;
+        }
+        public object GetNewDetail(int newsId)
+        {
+            var dailyNews = DailyNews();
+            try
+            {
+                var news = _context.News.SingleOrDefault(x => x.NewsId == newsId);
+                var detailNews = new NewDetail();
+                detailNews.NewsId = news.NewsId;
+                detailNews.Title = news.Title;
+                detailNews.Subtitle = news.Subtitle;
+                detailNews.Content = news.Content;
+                detailNews.CreateDate = news.CreateDate?.ToString("dd-MM-yyyy");
+                if (news == null)
+                {
+                    return new
+                    {
+                        message = "No data to return",
+                        status = 400,
+                    };
+                }
+                return new
+                {
+                    message = "Get data successfully",
+                    status = 200,
+                    data = detailNews,
+                    dailyNews = dailyNews,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "No data to return",
+                    status = 400,
+                };
+            }
+        }
+        public object GetNewsByPage(int page, int pageSize)
+        {
+            try
+            {
+                int startIndex = (page - 1) * pageSize;
+                var totalNews = GetTotalNewsCount();
+                var result = _context.News.Skip(startIndex).Take(pageSize);
+                return new
+                {
+                    message = "Get data succfully",
+                    status = 200,
+                    totalCount = totalNews,
+                    data = result,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Failed",
+                    status = 400,
+                };
+            }
+        }
+        public int GetTotalNewsCount()
+        {
+            return _context.News.Count();
+        }
     }
 }
+
