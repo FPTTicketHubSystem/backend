@@ -12,9 +12,13 @@ namespace backend.Services.NewsService
         {
             _newsRepository = newsRepository;
         }
-        public async Task<object> GetAllNews(string status = "")
+        public async Task<object> GetAllNewsAdmin(string status = "")
         {
-            return await _newsRepository.GetAllNews(status);
+            return await _newsRepository.GetAllNewsAdmin(status);
+        }
+        public async Task<object> GetAllNews()
+        {
+            return await _newsRepository.GetAllNews();
         }
         public async Task<object> GetNewsByAccount(int accountId)
         {

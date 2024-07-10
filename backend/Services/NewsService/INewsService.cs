@@ -4,7 +4,8 @@ namespace backend.Services.NewsService
 {
     public interface INewsService
     {
-        Task<object> GetAllNews(string status = "");
+        Task<object> GetAllNews();
+        Task<object> GetAllNewsAdmin(string status = "");
         Task<object> GetNewsByAccount(int accountId);
         Task<object> GetNewsById(int newsId);
         object AddNews(NewsDTO newsDTO);

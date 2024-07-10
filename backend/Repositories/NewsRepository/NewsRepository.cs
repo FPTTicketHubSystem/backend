@@ -13,11 +13,11 @@ namespace backend.Repositories.NewsRepository
             _context = context;
         }
 
-        /*public async Task<object> GetAllNews()
+        public async Task<object> GetAllNews()
         {
             var data = _context.News
                 .Include(n => n.Account)
-                .Where(n => n.Status == "1" && n.Status == "0" )
+                .Where(n => n.Status == "Đã duyệt")
                 .OrderByDescending(n => n.CreateDate)
                 .Select(n =>
                 new
@@ -33,9 +33,9 @@ namespace backend.Repositories.NewsRepository
                     n.Status,
                 });
             return data;
-        }*/
+        }
 
-        public async Task<object> GetAllNews(string status = "")
+        public async Task<object> GetAllNewsAdmin(string status = "")
         {
             var query = _context.News
                 .Include(n => n.Account)
@@ -53,8 +53,6 @@ namespace backend.Repositories.NewsRepository
                     n.CreateDate,
                     n.Status,
                 });
-
-            // Apply status filter if specified
             if (!string.IsNullOrEmpty(status))
             {
                 query = query.Where(n => n.Status == status);

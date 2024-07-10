@@ -17,7 +17,7 @@ namespace backend.Controllers
         }
 
         //GET: api/news
-        /*[HttpGet("getAllNews")]
+        [HttpGet("getAllNews")]
         public async Task<ActionResult> GetAllNews()
         {
             try
@@ -29,13 +29,14 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
-        }*/
-        [HttpGet("getAllNews")]
-        public async Task<ActionResult> GetAllNews([FromQuery] string status = "")
+        }
+
+        [HttpGet("getAllNewsAdmin")]
+        public async Task<ActionResult> GetAllNewsAdmin([FromQuery] string status = "")
         {
             try
             {
-                var data = await _newService.GetAllNews(status);
+                var data = await _newService.GetAllNewsAdmin(status);
                 return Ok(data);
             }
             catch
