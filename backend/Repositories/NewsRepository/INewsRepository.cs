@@ -16,3 +16,4 @@ namespace backend.Repositories.NewsRepository
         object GetNewsByPage(int page, int pageSize);
     }
 }
+

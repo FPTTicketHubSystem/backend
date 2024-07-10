@@ -15,3 +15,4 @@ namespace backend.Services.NewsService
         public object GetNewsByPage(int page, int pageSize);
     }
 }
+
