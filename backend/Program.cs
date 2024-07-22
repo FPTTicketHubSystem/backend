@@ -2,10 +2,14 @@ using backend.Models;
 using backend.Repositories.EventRepository;
 using backend.Repositories.EventStaffRepository;
 using backend.Repositories.NewsRepository;
+using backend.Repositories.PaymentRepository;
+using backend.Repositories.TicketRepository;
 using backend.Repositories.UserRepository;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
 using backend.Services.NewsService;
+using backend.Services.PaymentService;
+using backend.Services.TicketService;
 using backend.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -67,6 +71,11 @@ services.AddScoped<IEventStaffRepository, EventStaffRepository>();
 services.AddScoped<IEventStaffService, EventStaffService>();
 services.AddScoped<INewsRepository, NewsRepository>();
 services.AddScoped<INewsService, NewsService>();
+services.AddScoped<IPaymentRepository, PaymentRepository>();
+services.AddScoped<IPaymentService, PaymentService>();
+services.AddScoped<ITicketRepository, TicketRepository>();
+services.AddScoped<ITicketService, TicketService>();
+
 
 var app = builder.Build();
 

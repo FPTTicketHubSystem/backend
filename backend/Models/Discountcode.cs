@@ -24,4 +24,9 @@ public partial class Discountcode
     public virtual Event? Event { get; set; }
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    //public static implicit operator object?(Discountcode v)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }
