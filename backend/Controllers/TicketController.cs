@@ -1,0 +1,42 @@
+﻿using backend.Services.NewsService;
+using backend.Services.TicketService;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace backend.Controllers
+{
+    [Route("api/ticket")]
+    [ApiController]
+    public class TicketController : ControllerBase
+    {
+        private readonly ITicketService _ticketService;
+        public TicketController(ITicketService ticketService)
+        {
+            _ticketService = ticketService;
+        }
+        [HttpGet("getTicketByAccount")]
+        public async Task<ActionResult> GetTicketByAccount(int accountId)
+        {
+            try
+            {
+                var data = await _ticketService.GetTicketByAccount(accountId);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        [HttpGet("getTicketById")]
+        public async Task<ActionResult> GetTicketById(int ticketId)
+        {
+            try
+            {
+                var data = _ticketService.GetTicketById(ticketId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+    }
+}
