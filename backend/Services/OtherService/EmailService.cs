@@ -30,7 +30,7 @@ namespace backend.Services.OtherService
                 string subject = "";
                 if (type == 1)
                 {
-                    _text = EmailHelper.Instance.RegisterMail(fullname, account, password);
+                    _text = EmailHelper.Instance.RegisterMail(fullname, account);
                     subject = "Đăng ký tài khoản FPTTicketHub - Xác nhận tài khoản";
                 }
                 if (type == 2)
@@ -60,5 +60,35 @@ namespace backend.Services.OtherService
             }
 
         }
+
+        public async Task<bool> SendEventReminderMail(string email, string fullname, string eventName, DateTime eventStartTime, string eventLocation, string eventAddress)
+        {
+            try
+            {
+                string subject = $"Lời nhắc: Sự kiện {eventName} sắp diễn ra";
+                string _text = EmailHelper.Instance.EventReminderMail(fullname, eventName, eventStartTime, eventLocation, eventAddress);
+
+                var message = new MimeMessage();
+                message.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));
+                message.To.Add(MailboxAddress.Parse(email));
+                message.Subject = subject;
+                message.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = _text
+                };
+
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, false);
+                await smtp.AuthenticateAsync("fpttickethub@gmail.com", "urjiyqjypwkfazec");
+                await smtp.SendAsync(message);
+                await smtp.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
     }
 }
