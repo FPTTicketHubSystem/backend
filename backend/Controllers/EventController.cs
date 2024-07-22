@@ -116,5 +116,19 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpPost("changeEventStatus")]
+        public async Task<ActionResult> ChangeEventStatus(int eventId, string status)
+        {
+            try
+            {
+                var data = await _eventService.ChangeEventStatus(eventId, status);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

@@ -292,7 +292,43 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-
+        public async Task<object> ChangeEventStatus(int eventId, string status)
+        {
+            try
+            {
+                var existingEvent = await _context.Events
+                    .Include(e => e.Account)
+                    .FirstOrDefaultAsync(e => e.EventId == eventId);
+                if (existingEvent == null)
+                {
+                    return new
+                    {
+                        message = "NotFound",
+                        status = 400
+                    };
+                }
+                existingEvent.Status = status;
+                if (status == "Đã duyệt")
+                {
+                    existingEvent.Account.RoleId = 3;
+                }
+                await _context.SaveChangesAsync();
+                return new
+                {
+                    message = "Status changed",
+                    status = 200,
+                    existingEvent
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Fail to change status",
+                    status = 400
+                };
+            }
+        }
 
     }
 }

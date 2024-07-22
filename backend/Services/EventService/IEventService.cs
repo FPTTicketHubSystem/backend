@@ -14,5 +14,6 @@ namespace backend.Services.EventService
         object GetEventByCategory(int categoryId);
 
         Task<object> GetUpcomingEvent();
+        Task<object> ChangeEventStatus(int eventId, string status);
     }
 }

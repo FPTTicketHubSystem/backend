@@ -13,5 +13,6 @@ namespace backend.Repositories.EventRepository
         object GetEventById(int eventId);
         object GetEventByCategory(int categoryId);
         Task<object> GetUpcomingEvent();
+        Task<object> ChangeEventStatus(int eventId, string status);
     }
 }

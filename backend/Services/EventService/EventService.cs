@@ -55,5 +55,10 @@ namespace backend.Services.EventService
             return await _eventRepository.GetUpcomingEvent();
         }
 
+        public async Task<object> ChangeEventStatus(int eventId, string status)
+        {
+            return await _eventRepository.ChangeEventStatus(eventId, status);
+        }
+
     }
 }
