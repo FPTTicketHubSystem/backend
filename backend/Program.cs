@@ -2,6 +2,7 @@ using backend.Models;
 using backend.Repositories.EventRepository;
 using backend.Repositories.EventStaffRepository;
 using backend.Repositories.NewsRepository;
+using backend.Repositories.StaffRepository;
 using backend.Repositories.StatisticRepository;
 using backend.Repositories.UserRepository;
 using backend.Repositories.EventRepository;
@@ -9,6 +10,8 @@ using backend.Repositories.ForumRepository;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
 using backend.Services.NewsService;
+using backend.Services.OtherService;
+using backend.Services.StaffService;
 using backend.Services.StatisticService;
 using backend.Services.UserService;
 using backend.Services.EventService;
@@ -45,6 +48,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddHostedService<EmailReminderService>();
+builder.Services.AddLogging();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -73,6 +79,8 @@ services.AddScoped<IEventStaffRepository, EventStaffRepository>();
 services.AddScoped<IEventStaffService, EventStaffService>();
 services.AddScoped<INewsRepository, NewsRepository>();
 services.AddScoped<INewsService, NewsService>();
+services.AddScoped<IStaffRepository, StaffRepository>();
+services.AddScoped<IStaffService, StaffService>();
 services.AddScoped<IStatisticRepository, StatisticRepository>();
 services.AddScoped<IStatisticService, StatisticService>();
 services.AddScoped<IForumRepository, ForumRepository>();
