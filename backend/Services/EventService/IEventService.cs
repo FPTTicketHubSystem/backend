@@ -9,11 +9,12 @@ namespace backend.Services.EventService
         Task<object> GetAllEvent();
         Task<object> GetAllEventAdmin();
         object AddEvent(EventDTO newEvent);
-        object EditEvent(int eventId, EventDTO updatedEventDto);
+        object EditEvent(EventDTO updatedEventDto);
         object GetEventById(int eventId);
         object GetEventByCategory(int categoryId);
-
         Task<object> GetUpcomingEvent();
         Task<object> ChangeEventStatus(int eventId, string status);
+        Task<object> GetEventByAccount(int accountId);
+        object GetEventForEdit(int eventId);
     }
 }

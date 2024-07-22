@@ -32,9 +32,9 @@ namespace backend.Services.EventService
             return result;
         }
 
-        public object EditEvent(int eventId, EventDTO updatedEventDto)
+        public object EditEvent(EventDTO updatedEventDto)
         {
-            var result = _eventRepository.EditEvent(eventId, updatedEventDto);
+            var result = _eventRepository.EditEvent(updatedEventDto);
             return result;
         }
 
@@ -58,6 +58,17 @@ namespace backend.Services.EventService
         public async Task<object> ChangeEventStatus(int eventId, string status)
         {
             return await _eventRepository.ChangeEventStatus(eventId, status);
+        }
+
+        public async Task<object> GetEventByAccount(int accountId)
+        {
+            return await _eventRepository.GetEventByAccount(accountId);
+        }
+
+        public object GetEventForEdit(int eventId)
+        {
+            var result = _eventRepository.GetEventForEdit(eventId);
+            return result;
         }
 
     }

@@ -9,10 +9,12 @@ namespace backend.Repositories.EventRepository
         Task<object> GetAllEvent();
         Task<object> GetAllEventAdmin();
         object AddEvent(EventDTO newEventDto);
-        object EditEvent(int eventId, EventDTO updatedEventDto);
+        object EditEvent(EventDTO updatedEventDto);
         object GetEventById(int eventId);
         object GetEventByCategory(int categoryId);
         Task<object> GetUpcomingEvent();
         Task<object> ChangeEventStatus(int eventId, string status);
+        object GetEventForEdit(int eventId);
+        Task<object> GetEventByAccount(int accountId);
     }
 }
