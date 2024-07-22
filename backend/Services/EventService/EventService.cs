@@ -21,9 +21,9 @@ namespace backend.Services.EventService
             return await _eventRepository.GetAllEvent();
         }
 
-        public async Task<object> GetEventByAccount(int accountId)
+        public async Task<object> GetAllEventAdmin()
         {
-            return await _eventRepository.GetEventByAccount(accountId);
+            return await _eventRepository.GetAllEventAdmin();
         }
 
         public object AddEvent(EventDTO newEvent)
@@ -32,15 +32,9 @@ namespace backend.Services.EventService
             return result;
         }
 
-        public object GetEventForEdit(int eventId)
+        public object EditEvent(int eventId, EventDTO updatedEventDto)
         {
-            var result = _eventRepository.GetEventForEdit(eventId);
-            return result;
-        }
-
-        public object EditEvent(EventDTO updatedEventDto)
-        {
-            var result = _eventRepository.EditEvent(updatedEventDto);
+            var result = _eventRepository.EditEvent(eventId, updatedEventDto);
             return result;
         }
 
@@ -59,6 +53,11 @@ namespace backend.Services.EventService
         public async Task<object> GetUpcomingEvent()
         {
             return await _eventRepository.GetUpcomingEvent();
+        }
+
+        public async Task<object> ChangeEventStatus(int eventId, string status)
+        {
+            return await _eventRepository.ChangeEventStatus(eventId, status);
         }
 
     }
