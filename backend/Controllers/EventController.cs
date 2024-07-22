@@ -33,12 +33,12 @@ namespace backend.Controllers
         }
 
         //GET: api/event
-        [HttpGet("getEventByAccount")]
-        public async Task<ActionResult> GetEventByAccount(int accountId)
+        [HttpGet("getAllEventAdmin")]
+        public async Task<ActionResult> GetAllEventAdmin()
         {
             try
             {
-                var data = await _eventService.GetEventByAccount(accountId);
+                var data = await _eventService.GetAllEventAdmin();
                 return Ok(data);
             }
             catch
@@ -63,25 +63,13 @@ namespace backend.Controllers
             }
         }
 
-        // GET: api/event 
-        [HttpGet("getEventForEdit")]
-        public async Task<ActionResult> GetEventForEdit(int eventId)
-        {
-            try
-            {
-                var data = _eventService.GetEventForEdit(eventId);
-                return Ok(data);
-            }
-            catch { return BadRequest(); }
-        }
-
         // POST: api/event
         [HttpPost("editEvent")]
-        public async Task<ActionResult> EditEvent(EventDTO updatedEventDto)
+        public async Task<ActionResult> EditEvent(int eventId, EventDTO updatedEventDto)
         {
             try
             {
-                var result = _eventService.EditEvent(updatedEventDto);
+                var result = _eventService.EditEvent(eventId, updatedEventDto);
                 return Ok(result);
             }
             catch
@@ -121,6 +109,20 @@ namespace backend.Controllers
             try
             {
                 var data = await _eventService.GetUpcomingEvent();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("changeEventStatus")]
+        public async Task<ActionResult> ChangeEventStatus(int eventId, string status)
+        {
+            try
+            {
+                var data = await _eventService.ChangeEventStatus(eventId, status);
                 return Ok(data);
             }
             catch

@@ -4,13 +4,22 @@ using backend.Repositories.EventStaffRepository;
 using backend.Repositories.NewsRepository;
 using backend.Repositories.PaymentRepository;
 using backend.Repositories.TicketRepository;
+using backend.Repositories.StaffRepository;
+using backend.Repositories.StatisticRepository;
 using backend.Repositories.UserRepository;
+using backend.Repositories.EventRepository;
+using backend.Repositories.ForumRepository;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
 using backend.Services.NewsService;
 using backend.Services.PaymentService;
 using backend.Services.TicketService;
+using backend.Services.OtherService;
+using backend.Services.StaffService;
+using backend.Services.StatisticService;
 using backend.Services.UserService;
+using backend.Services.EventService;
+using backend.Services.ForumService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
@@ -43,6 +52,9 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
+builder.Services.AddSingleton<EmailService>();
+builder.Services.AddHostedService<EmailReminderService>();
+builder.Services.AddLogging();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -75,7 +87,12 @@ services.AddScoped<IPaymentRepository, PaymentRepository>();
 services.AddScoped<IPaymentService, PaymentService>();
 services.AddScoped<ITicketRepository, TicketRepository>();
 services.AddScoped<ITicketService, TicketService>();
-
+services.AddScoped<IStaffRepository, StaffRepository>();
+services.AddScoped<IStaffService, StaffService>();
+services.AddScoped<IStatisticRepository, StatisticRepository>();
+services.AddScoped<IStatisticService, StatisticService>();
+services.AddScoped<IForumRepository, ForumRepository>();
+services.AddScoped<IForumService, ForumService>();
 
 var app = builder.Build();
 
