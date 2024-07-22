@@ -5,6 +5,7 @@ namespace backend.Models
 {
     public class EventDTO
     {
+        public int EventId { get; set; }
         public int AccountId { get; set; }
         public int CategoryId { get; set; }
         public string EventName { get; set; }
@@ -14,7 +15,6 @@ namespace backend.Models
         public string Location { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public int TicketQuantity { get; set; }
         public string Status { get; set; }
         public List<EventImageDTO> EventImages { get; set; }
         public List<TicketTypeDTO> TicketTypes { get; set; }

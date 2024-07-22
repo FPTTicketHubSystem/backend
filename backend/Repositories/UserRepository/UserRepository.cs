@@ -374,8 +374,6 @@ namespace backend.Repositories.UserRepository
         public object GetAllAccountUser()
         {
             var userList = _context.Accounts.Include(e => e.Role).Where(x => x.RoleId != 1).OrderByDescending(x => x.AccountId);
-
-
             if (userList == null)
             {
                 return new
