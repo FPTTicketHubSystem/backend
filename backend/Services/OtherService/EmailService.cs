@@ -1,4 +1,4 @@
-﻿using MimeKit;
+using MimeKit;
 using MimeKit.Text;
 using MailKit.Net.Smtp;
 using MailKit.Security;
@@ -88,6 +88,38 @@ namespace backend.Services.OtherService
             {
                 return false;
             }
+        }
+
+        public async Task<bool> SendTicketEmail(string mail, string fullName, int ticketId, string ticketType, int quantity, int orderId, decimal paymentAmount, string eventName, DateTime eventStartTime, string eventLocation, string eventAddress)
+        {
+            try
+            {
+                string _text = "";
+                string subject = "";
+                _text = EmailHelper.Instance.TicketEmail(fullName, ticketId, ticketType, quantity, orderId, paymentAmount, eventName, eventStartTime, eventLocation, eventAddress);
+                subject = $"FPTTicketHub - Vé điện tử cho đơn hàng {orderId}";
+
+
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));
+                email.To.Add(MailboxAddress.Parse(mail));
+                email.Subject = subject;
+                email.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = _text
+                };
+                var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, false);
+                await smtp.AuthenticateAsync("fpttickethub@gmail.com", "urjiyqjypwkfazec");
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
         }
 
     }
