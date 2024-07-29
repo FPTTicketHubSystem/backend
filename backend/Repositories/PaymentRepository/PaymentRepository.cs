@@ -165,7 +165,7 @@ namespace backend.Repositories.PaymentRepository
             vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + DateTime.Now.Ticks);
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
-            vnpay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
+            vnpay.AddRequestData("vnp_TxnRef", Convert.ToString(_order.OrderId));
 
             string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
             //Response.Redirect(paymentUrl);
@@ -200,6 +200,18 @@ namespace backend.Repositories.PaymentRepository
                     message = "Thanh toan that bai",
                 };
             }
+            var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == Convert.ToInt32(vnp_orderId));
+            foreach(var orderDetail in getOrderDetail)
+            {
+                Ticket addNewTicket = new Ticket();
+                addNewTicket.OrderDetailId = orderDetail.OrderDetailId;
+                addNewTicket.Status = "";
+                addNewTicket.IsCheckedIn = false;
+                addNewTicket.CheckInDate = null;
+                _context.Add(addNewTicket);
+                _context.SaveChanges();
+            }
+            
             return new
             {
                 status = 200,
@@ -252,6 +264,28 @@ namespace backend.Repositories.PaymentRepository
                 };
             }
             
+        }
+
+        public object CheckInputCoupon(int eventId, string coupon)
+        {
+            var avaliableCoupon = _context.Discountcodes.SingleOrDefault(x => x.Code.Equals(coupon) && x.Quantity > 0);
+            if(avaliableCoupon != null)
+            {
+                return new
+                {
+                    status = 200,
+                    message = "Avaliable coupon",
+                    discountAmount = avaliableCoupon.DiscountAmount,
+                };
+            } else
+            {
+                return new
+                {
+                    status = 400,
+                    message = "Sold out coupon",
+                };
+            }
+
         }
     }
 }

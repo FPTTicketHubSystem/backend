@@ -14,6 +14,11 @@ namespace backend.Services.PaymentService
             _paymentRepository = paymentRepository;
         }
 
+        public object CheckInputCoupon(int eventId, string coupon)
+        {
+            return _paymentRepository.CheckInputCoupon(eventId, coupon);
+        }
+
         public object DeleteTimeOutOrder(PaymentDTO paymentDTO)
         {
             return _paymentRepository.DeleteTimeOutOrder(paymentDTO);

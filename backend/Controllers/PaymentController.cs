@@ -86,5 +86,19 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("checkInputCoupon")]
+        public async Task<ActionResult> CheckInputCoupon(int eventId, string coupon)
+        {
+            try
+            {
+                var result = _paymentService.CheckInputCoupon(eventId, coupon);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
     }
 }
