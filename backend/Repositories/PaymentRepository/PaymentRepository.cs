@@ -30,7 +30,7 @@ namespace backend.Repositories.PaymentRepository
                 orderSignUp.OrderDate = dateTime;
                 orderSignUp.Total = paymentDTO.TotalPayment;
                 orderSignUp.Status = "Đang xử lý";
-                _context.Add(orderSignUp);
+                _context.Orders.Add(orderSignUp);
                 _context.SaveChanges();
 
                 Order order = _context.Orders.Where(x => x.AccountId == paymentDTO.AccountId && x.OrderDate == dateTime).SingleOrDefault();
@@ -52,7 +52,7 @@ namespace backend.Repositories.PaymentRepository
                     orderdetailSignUp.Subtotal = subToTal;
 
                     paymentAmount = (decimal)(paymentAmount + orderdetailSignUp.Subtotal);
-                    _context.Add(orderdetailSignUp);
+                    _context.Orderdetails.Add(orderdetailSignUp);
                     _context.SaveChanges();
                 }
 
@@ -121,7 +121,7 @@ namespace backend.Repositories.PaymentRepository
 
         public object ReturnPaymentUrl(HttpContext context, int _orderId, string _discounrCode)
         {
-            string vnp_Returnurl = "http://localhost:3000/myticket";
+            string vnp_Returnurl = "https://localhost:7096/api/payment/paymentCallBack";
             string vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
             string vnp_TmnCode = "DH72XW45";
             string vnp_HashSecret = "8BNW3HO6R9QA8W8HDLWCET6TJLP6WDU5";
@@ -192,30 +192,37 @@ namespace backend.Repositories.PaymentRepository
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, "8BNW3HO6R9QA8W8HDLWCET6TJLP6WDU5");
-            if(!checkSignature)
+            if(checkSignature)
             {
+                
+                var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == Convert.ToInt32(vnp_orderId)).ToList();
+                foreach (var orderDetail in getOrderDetail)
+                {
+                    Ticket addNewTicket = new Ticket();
+                    addNewTicket.OrderDetailId = orderDetail.OrderDetailId;
+                    addNewTicket.Status = "";
+                    addNewTicket.IsCheckedIn = false;
+                    addNewTicket.CheckInDate = null;
+                    _context.Tickets.Add(addNewTicket);
+                    _context.SaveChanges();
+                }
+                var order = _context.Orders.FirstOrDefault(x => x.OrderId == Convert.ToInt32(vnp_orderId));
+                if (order != null)
+                {
+                    order.Status = "Đã thanh toán";
+                    _context.SaveChanges();
+                }
                 return new
                 {
-                    status = 400,
-                    message = "Thanh toan that bai",
+                    status = 200,
+                    VnPayResponse = vnp_ResponseCode
                 };
-            }
-            var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == Convert.ToInt32(vnp_orderId));
-            foreach(var orderDetail in getOrderDetail)
-            {
-                Ticket addNewTicket = new Ticket();
-                addNewTicket.OrderDetailId = orderDetail.OrderDetailId;
-                addNewTicket.Status = "";
-                addNewTicket.IsCheckedIn = false;
-                addNewTicket.CheckInDate = null;
-                _context.Add(addNewTicket);
-                _context.SaveChanges();
             }
             
             return new
             {
-                status = 200,
-                VnPayResponse = vnp_ResponseCode
+                status = 400,
+                message = "Thanh toan that bai",
             };
         }
 
@@ -242,12 +249,12 @@ namespace backend.Repositories.PaymentRepository
                         var deleteDetail = _context.Orderdetails.SingleOrDefault(x => x.OrderDetailId == delete.OrderDetailId);
                         if (deleteDetail != null)
                         {
-                            _context.Remove(deleteDetail);
+                            _context.Orderdetails.Remove(deleteDetail);
                             _context.SaveChanges();
                         }
                     }
                 }
-                _context.Remove(deleteOrder);
+                _context.Orders.Remove(deleteOrder);
                 _context.SaveChanges();
                 return new
                 {
