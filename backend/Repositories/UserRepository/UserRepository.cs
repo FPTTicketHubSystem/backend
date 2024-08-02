@@ -373,8 +373,8 @@ namespace backend.Repositories.UserRepository
 
         public object GetAllAccountUser()
         {
-            var userList = _context.Accounts.Include(e => e.Role).Where(x => x.RoleId != 1).OrderByDescending(x => x.AccountId);
-            if (userList == null)
+            var userList = _context.Accounts.Include(e => e.Role).OrderByDescending(x => x.AccountId);
+            if (userList == null || !userList.Any())
             {
                 return new
                 {
@@ -474,7 +474,36 @@ namespace backend.Repositories.UserRepository
                 data = data,
             };
         }
+        public async Task<object> ChangeAccountRole(int accountId, int newRoleId)
+        {
+            try
+            {
+                var existingAccount = await _context.Accounts.FirstOrDefaultAsync(x => x.AccountId == accountId);
+                if (existingAccount == null)
+                {
+                    return new
+                    {
+                        message = "NotFound",
+                        status = 400
+                    };
+                }
+                existingAccount.RoleId = newRoleId;
+                await _context.SaveChangesAsync();
+                return new
+                {
+                    message = "Role Changed",
+                    status = 200
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Fail to change account role",
+                    status = 400
+                };
+            }
+        }
 
-
-    }
+        }
 }

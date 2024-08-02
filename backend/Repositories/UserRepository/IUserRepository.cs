@@ -24,5 +24,7 @@ namespace backend.Repositories.UserRepository
 
         public object GetPhoneNumberWithoutThisPhone(string phoneNumber);
 
+        Task<object> ChangeAccountRole(int accountId, int newRoleId);
+
     }
 }
