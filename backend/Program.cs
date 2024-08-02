@@ -7,7 +7,7 @@ using backend.Repositories.TicketRepository;
 using backend.Repositories.StaffRepository;
 using backend.Repositories.StatisticRepository;
 using backend.Repositories.UserRepository;
-using backend.Repositories.EventRepository;
+using backend.Repositories.EventRatingRepository;
 using backend.Repositories.ForumRepository;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
@@ -18,12 +18,12 @@ using backend.Services.OtherService;
 using backend.Services.StaffService;
 using backend.Services.StatisticService;
 using backend.Services.UserService;
-using backend.Services.EventService;
 using backend.Services.ForumService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+using backend.Services.EventRatingService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +54,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddHostedService<EmailReminderService>();
+builder.Services.AddHostedService<EmailRatingService>();
 builder.Services.AddLogging();
 
 // Add CORS
@@ -84,6 +85,7 @@ services.AddScoped<IEventStaffService, EventStaffService>();
 services.AddScoped<INewsRepository, NewsRepository>();
 services.AddScoped<INewsService, NewsService>();
 services.AddScoped<IPaymentRepository, PaymentRepository>();
+services.AddScoped<IEventRatingRepository, EventRatingRepository>();
 services.AddScoped<IPaymentService, PaymentService>();
 services.AddScoped<ITicketRepository, TicketRepository>();
 services.AddScoped<ITicketService, TicketService>();
@@ -93,6 +95,7 @@ services.AddScoped<IStatisticRepository, StatisticRepository>();
 services.AddScoped<IStatisticService, StatisticService>();
 services.AddScoped<IForumRepository, ForumRepository>();
 services.AddScoped<IForumService, ForumService>();
+services.AddScoped<IEventRatingService, EventRatingService>();
 
 var app = builder.Build();
 

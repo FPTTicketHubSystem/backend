@@ -89,6 +89,32 @@ namespace backend.Services.OtherService
                 return false;
             }
         }
+        public async Task<bool> SendRatingRequestMail(string email, string fullname, string eventName, int eventRatingId)
+        {
+            try
+            {
+                string subject = $"Đánh giá sự kiện {eventName}";
+                string _text = EmailHelper.Instance.RatingRequestMail(fullname, eventName, eventRatingId);
+                var message = new MimeMessage();
+                message.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));
+                message.To.Add(MailboxAddress.Parse(email));
+                message.Subject = subject;
+                message.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = _text
+                };
+                using var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, false);
+                await smtp.AuthenticateAsync("fpttickethub@gmail.com", "urjiyqjypwkfazec");
+                await smtp.SendAsync(message);
+                await smtp.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
     }
 }
