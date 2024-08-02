@@ -42,4 +42,34 @@ namespace backend.Models
         public int Quantity { get; set; }
         public string Status { get; set; }
     }
+    public class EventRevenueDto
+    {
+        public int EventId { get; set; }
+        public string EventName { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+    public class EventParticipantsDto
+    {
+        public int EventId { get; set; }
+        public string EventName { get; set; }
+        public int TotalParticipants { get; set; }
+    }
+    public class EventRatingDto
+    {
+        public int EventId { get; set; }
+        public string EventName { get; set; }
+        public double AverageRating { get; set; }
+    }
+    public class MonthlyRevenueDto
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+    public class MonthlyParticipantsDto
+    {
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int TotalParticipants { get; set; }
+    }
 }
