@@ -1,31 +1,52 @@
-﻿using backend.Repositories.StatisticRepository;
+﻿using backend.Models;
+using backend.Repositories.NewsRepository;
+using backend.Repositories.StatisticRepository;
 
 namespace backend.Services.StatisticService
 {
     public class StatisticService : IStatisticService
     {
         private readonly IStatisticRepository _statisticRepository;
-        public StatisticService(IStatisticRepository statisticRepository) { 
+        public StatisticService(IStatisticRepository statisticRepository)
+        {
             _statisticRepository = statisticRepository;
         }
-        public int GetTotalParticipants(int eventId)
+
+        public async Task<decimal> GetTotalRevenue()
         {
-            return _statisticRepository.GetTotalParticipants(eventId);
+            return await _statisticRepository.GetTotalRevenue();
         }
 
-        public int GetUserEventCount(int userId)
+        public async Task<int> GetTotalParticipants()
         {
-            return _statisticRepository.GetUserEventCount(userId);
+            return await _statisticRepository.GetTotalParticipants();
+        }
+        public async Task<IEnumerable<MonthlyRevenueDto>> GetMonthlyRevenue()
+        {
+            return await _statisticRepository.GetMonthlyRevenue();
+        }
+        public async Task<IEnumerable<MonthlyParticipantsDto>> GetMonthlyParticipants()
+        {
+            return await _statisticRepository.GetMonthlyParticipants();
+        }
+        public async Task<IEnumerable<EventRatingDto>> GetTopRatedEvents()
+        {
+            return await _statisticRepository.GetTopRatedEvents();
         }
 
-        public decimal GetTotalIncome(int eventId)
+        public async Task<IEnumerable<EventRevenueDto>> GetTopRevenueEvents()
         {
-            return _statisticRepository.GetTotalIncome(eventId);
+            return await _statisticRepository.GetTopRevenueEvents();
         }
 
-        public int GetTotalTicketsSold(int eventId)
+        public async Task<IEnumerable<EventParticipantsDto>> GetTopParticipantsEvents()
         {
-            return _statisticRepository.GetTotalTicketsSold(eventId);
+            return await _statisticRepository.GetTopParticipantsEvents();
+        }
+
+        public async Task<byte[]> GenerateEventStatisticsReport()
+        {
+            return await _statisticRepository.GenerateEventStatisticsReport();
         }
     }
 }
