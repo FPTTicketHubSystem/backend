@@ -7,13 +7,14 @@ namespace backend.Services.EventService
     public interface IEventService
     {
         Task<object> GetAllEvent();
-        Task<object> GetEventByAccount(int accountId);
+        Task<object> GetAllEventAdmin();
         object AddEvent(EventDTO newEvent);
-        object GetEventForEdit(int eventId);
         object EditEvent(EventDTO updatedEventDto);
         object GetEventById(int eventId);
         object GetEventByCategory(int categoryId);
-
         Task<object> GetUpcomingEvent();
+        Task<object> ChangeEventStatus(int eventId, string status);
+        Task<object> GetEventByAccount(int accountId);
+        object GetEventForEdit(int eventId);
     }
 }

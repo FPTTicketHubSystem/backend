@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using backend.DTOs;
 using backend.Models;
 using backend.Services.EventService;
 using Microsoft.AspNetCore.Mvc;
@@ -34,12 +33,12 @@ namespace backend.Controllers
         }
 
         //GET: api/event
-        [HttpGet("getEventByAccount")]
-        public async Task<ActionResult> GetEventByAccount(int accountId)
+        [HttpGet("getAllEventAdmin")]
+        public async Task<ActionResult> GetAllEventAdmin()
         {
             try
             {
-                var data = await _eventService.GetEventByAccount(accountId);
+                var data = await _eventService.GetAllEventAdmin();
                 return Ok(data);
             }
             catch
@@ -62,18 +61,6 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
-        }
-
-        // GET: api/event 
-        [HttpGet("getEventForEdit")]
-        public async Task<ActionResult> GetEventForEdit(int eventId)
-        {
-            try
-            {
-                var data = _eventService.GetEventForEdit(eventId);
-                return Ok(data);
-            }
-            catch { return BadRequest(); }
         }
 
         // POST: api/event
@@ -128,6 +115,47 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPost("changeEventStatus")]
+        public async Task<ActionResult> ChangeEventStatus(int eventId, string status)
+        {
+            try
+            {
+                var data = await _eventService.ChangeEventStatus(eventId, status);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        //GET: api/event
+        [HttpGet("getEventByAccount")]
+        public async Task<ActionResult> GetEventByAccount(int accountId)
+        {
+            try
+            {
+                var data = await _eventService.GetEventByAccount(accountId);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        // GET: api/event 
+        [HttpGet("getEventForEdit")]
+        public async Task<ActionResult> GetEventForEdit(int eventId)
+        {
+            try
+            {
+                var data = _eventService.GetEventForEdit(eventId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
         }
     }
 }

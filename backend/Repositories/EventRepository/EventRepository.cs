@@ -44,13 +44,13 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public async Task<object> GetEventByAccount(int accountId)
+        public async Task<object> GetAllEventAdmin()
         {
             var data = _context.Events
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .Where(e => e.AccountId == accountId)
+                .Where(e => e.Status != "Nháp")
                 .OrderByDescending(e => e.StartTime)
                 .Select(e =>
                 new
@@ -71,10 +71,6 @@ namespace backend.Repositories.EventRepository
                     e.EndTime,
                     e.Status
                 });
-            if (data == null)
-            {
-                return null;
-            }
             return data;
         }
 
@@ -101,12 +97,12 @@ namespace backend.Repositories.EventRepository
 
                 var eventId = newEvent.EventId;
 
-                var eventImages = newEventDto.EventImages.Select(imageDto => new Eventimage
-                {
-                    EventId = eventId,
-                    ImageUrl = imageDto.ImageUrl,
-                    Status = ""
-                }).ToList();
+                //var eventImages = newEventDto.EventImages.Select(imageDto => new Eventimage
+                //{
+                //    EventId = eventId,
+                //    ImageUrl = imageDto.ImageUrl,
+                //    Status = ""
+                //}).ToList();
 
                 var ticketTypes = newEventDto.TicketTypes.Select(ticketTypeDto => new Tickettype
                 {
@@ -127,7 +123,7 @@ namespace backend.Repositories.EventRepository
                     Status = ""
                 }).ToList();
 
-                _context.Eventimages.AddRange(eventImages);
+                //_context.Eventimages.AddRange(eventImages);
                 _context.Tickettypes.AddRange(ticketTypes);
                 _context.Discountcodes.AddRange(discountCodes);
 
@@ -170,7 +166,7 @@ namespace backend.Repositories.EventRepository
                     e.StartTime,
                     e.EndTime,
                     e.Status,
-                    e.Eventimages,
+                    //e.Eventimages,
                     e.Tickettypes,
                     e.Discountcodes,
                 }).SingleOrDefault();
@@ -210,13 +206,13 @@ namespace backend.Repositories.EventRepository
                 var existingEventImages = _context.Eventimages.Where(ei => ei.EventId == updatedEventDto.EventId).ToList();
                 _context.Eventimages.RemoveRange(existingEventImages);
 
-                var updatedEventImages = updatedEventDto.EventImages.Select(imageDto => new Eventimage
-                {
-                    EventId = updatedEventDto.EventId,
-                    ImageUrl = imageDto.ImageUrl,
-                    Status = ""
-                }).ToList();
-                _context.Eventimages.AddRange(updatedEventImages);
+                //var updatedEventImages = updatedEventDto.EventImages.Select(imageDto => new Eventimage
+                //{
+                //    EventId = updatedEventDto.EventId,
+                //    ImageUrl = imageDto.ImageUrl,
+                //    Status = ""
+                //}).ToList();
+                //_context.Eventimages.AddRange(updatedEventImages);
 
                 var existingTicketTypes = _context.Tickettypes.Where(tt => tt.EventId == updatedEventDto.EventId).ToList();
                 _context.Tickettypes.RemoveRange(existingTicketTypes);
@@ -296,7 +292,7 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public object GetEventByCategory(int categoryId)
+        public object GetEventByCategory (int categoryId)
         {
             var data = _context.Events
                 .Include(e => e.Tickettypes)
@@ -317,7 +313,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .Where(e => e.Status == "Đã duyệt")
+                .Where(e => e.Status == "Đã duyệt" && e.StartTime > DateTime.Now)
                 .OrderByDescending(e => e.StartTime)
                 .Take(5)
                 .Select(e =>
@@ -343,5 +339,78 @@ namespace backend.Repositories.EventRepository
 
             return data;
         }
+
+        public async Task<object> ChangeEventStatus(int eventId, string status)
+        {
+            try
+            {
+                var existingEvent = await _context.Events
+                    .Include(e => e.Account)
+                    .FirstOrDefaultAsync(e => e.EventId == eventId);
+                if (existingEvent == null)
+                {
+                    return new
+                    {
+                        message = "NotFound",
+                        status = 400
+                    };
+                }
+                existingEvent.Status = status;
+                if (status == "Đã duyệt")
+                {
+                    existingEvent.Account.RoleId = 3;
+                }
+                await _context.SaveChangesAsync();
+                return new
+                {
+                    message = "Status changed",
+                    status = 200,
+                    existingEvent
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Fail to change status",
+                    status = 400
+                };
+            }
+        }
+
+        public async Task<object> GetEventByAccount(int accountId)
+        {
+            var data = _context.Events
+                .Include(e => e.Category)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Account)
+                .Where(e => e.AccountId == accountId)
+                .OrderByDescending(e => e.StartTime)
+                .Select(e =>
+                new
+                {
+                    e.Account.AccountId,
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Status
+                });
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
+        }
+
     }
 }

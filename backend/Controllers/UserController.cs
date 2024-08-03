@@ -104,7 +104,20 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+        [HttpPost("changeRole")]
+        public async Task<ActionResult> ChangeRole(int accountId, int newRoleId)
+        {
+            try
+            {
+                var result = await _userService.ChangeAccountRole(accountId, newRoleId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
 
-
-    }
+        }
+        }
 }
+
