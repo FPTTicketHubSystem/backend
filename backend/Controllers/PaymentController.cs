@@ -1,8 +1,12 @@
-﻿using backend.DTOs;
+﻿using Azure;
+using backend.DTOs;
 using backend.Models;
 using backend.Services.NewsService;
 using backend.Services.PaymentService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Net.payOS;
+using Net.payOS.Types;
 
 namespace backend.Controllers
 {
@@ -11,9 +15,12 @@ namespace backend.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        public PaymentController(IPaymentService paymentService)
+        private readonly PayOS _payOS;
+        private readonly FpttickethubContext _context;
+        public PaymentController(IPaymentService paymentService,FpttickethubContext context)
         {
             _paymentService = paymentService;
+            _context = context;
         }
 
         [HttpPost("paymentForUser")]
@@ -98,6 +105,182 @@ namespace backend.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPost("createPaymentWithPayos")]
+        public async Task<ActionResult> CreatePaymentWithPayos(ReturnPaymentURL returnPaymentURL)
+        {
+
+            try
+            {
+                int _orderId = returnPaymentURL.OrderId;
+                string _discountCode = returnPaymentURL.DiscountCode;
+                Order _order = _context.Orders.Where(x => x.OrderId == _orderId).SingleOrDefault();
+                Payment paymentSignUp = new Payment();
+
+
+                var checkOrderDetails = _context.Orderdetails.FirstOrDefault(x => x.OrderId == returnPaymentURL.OrderId);
+                var checkTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == checkOrderDetails.TicketTypeId);
+                if (checkTicketType.Price > 0)
+                {
+
+                    PayOS _payOS = new PayOS("02e24a69-a908-4188-8f97-3bc3706857ae", "4fcc829a-c2af-431a-ad3f-b86584287b56", "e4ea17f84e63d87e2ccdbbf8e88e443207cdaaa62be0a1e7bc8bca05b62e368e");
+                    Discountcode discountCode = _context.Discountcodes.SingleOrDefault(x => x.Code == _discountCode);
+                    paymentSignUp.OrderId = _order.OrderId;
+                    paymentSignUp.Status = "0";
+                    if (discountCode != null)
+                    {
+                        paymentSignUp.DiscountCodeId = discountCode.DiscountCodeId;
+                        paymentSignUp.PaymentAmount = _order.Total * (discountCode.DiscountAmount / 100);
+                    }
+                    else
+                    {
+                        paymentSignUp.PaymentAmount = _order.Total;
+                    }
+                    paymentSignUp.PaymentDate = DateTime.Now;
+                    paymentSignUp.PaymentMethodId = 2;
+
+                    var orderDetailList = _context.Orderdetails.Where(x => x.OrderId == _order.OrderId).ToList();
+                    List<ItemData> items = new List<ItemData>();
+                    if (orderDetailList != null)
+                    {
+                        foreach (var orderDetail in orderDetailList)
+                        {
+                            var ticketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == orderDetail.TicketTypeId);
+                            var ticketName = "No Name";
+                            if (ticketType != null)
+                            {
+                                ticketName = ticketType.TypeName;
+                            }
+                            var quantity = orderDetail.Quantity != null ? orderDetail.Quantity : 0;
+                            var price = orderDetail.Subtotal > 0 ? orderDetail.Subtotal : 0;
+                            ItemData item = new ItemData(ticketName, (int)quantity, (int)price);
+
+                            items.Add(item);
+                        }
+                        //PaymentData paymentData = new PaymentData(_order.OrderId, (int)_order.Total, _order.Status, items, body.cancelUrl, body.returnUrl);
+                        var returnUrl = "http://localhost:3000/payment-success/" + _order.OrderId;
+                        var statusPayment = "Don hang " + _order.OrderId;
+                        PaymentData paymentData = new PaymentData(_order.OrderId, (int)_order.Total, statusPayment, items, returnUrl, returnUrl);
+                        CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
+                        return Ok(new
+                        {
+                            status = 200,
+                            message = "Thanh toan thanh cong",
+                            createPayment = createPayment, 
+                            paymentMethod = 0 // thanh toan bang tien
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new
+                        {
+                            status = 400,
+                            message = "Thanh toan that bai"
+                        });
+                    }
+                } else
+                {
+                    return Ok(new
+                    {
+                        status = 200,
+                        message = "Thanh toan thanh cong",
+                        paymentMethod = 1 // thanh toan bang tien
+                    });
+
+                }
+                
+                
+            }
+            catch (System.Exception exception)
+            {
+                return Ok(new
+                {
+                    status = 400,
+                    message = "Thanh toan that bai"
+                });
+            }
+        }
+
+        [HttpGet("checkOrderId")]
+        public async Task<ActionResult> CheckOrderId(int orderId)
+        {
+            try
+            {
+                int _orderId = orderId;
+                Order _order = _context.Orders.Where(x => x.OrderId == _orderId).SingleOrDefault();
+                Payment paymentSignUp = new Payment();
+
+
+                var checkOrderDetails = _context.Orderdetails.FirstOrDefault(x => x.OrderId == orderId);
+                var checkTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == checkOrderDetails.TicketTypeId);
+                if (checkTicketType.Price > 0)
+                {
+                    PayOS _payOS = new PayOS("02e24a69-a908-4188-8f97-3bc3706857ae", "4fcc829a-c2af-431a-ad3f-b86584287b56", "e4ea17f84e63d87e2ccdbbf8e88e443207cdaaa62be0a1e7bc8bca05b62e368e");
+                    PaymentLinkInformation paymentLinkInformation = await _payOS.getPaymentLinkInformation(orderId);
+                    if (paymentLinkInformation.status == "PAID")
+                    {
+                        var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == Convert.ToInt32(paymentLinkInformation.orderCode)).ToList();
+                        foreach (var orderDetail in getOrderDetail)
+                        {
+                            Ticket addNewTicket = new Ticket();
+                            addNewTicket.OrderDetailId = orderDetail.OrderDetailId;
+                            addNewTicket.Status = "";
+                            addNewTicket.IsCheckedIn = false;
+                            addNewTicket.CheckInDate = null;
+                            _context.Tickets.Add(addNewTicket);
+                            _context.SaveChanges();
+                        }
+                        var order = _context.Orders.FirstOrDefault(x => x.OrderId == Convert.ToInt32(paymentLinkInformation.orderCode));
+                        if (order != null)
+                        {
+                            order.Status = "Đã thanh toán";
+                            _context.SaveChanges();
+                        }
+                    }
+                    return Ok(new
+                    {
+                        status = 200,
+                        paymentLinkInformation = paymentLinkInformation,
+                        paymentMethod = 0 
+                    });
+                }
+                else
+                {
+                    var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == orderId).ToList();
+                    foreach (var orderDetail in getOrderDetail)
+                    {
+                        Ticket addNewTicket = new Ticket();
+                        addNewTicket.OrderDetailId = orderDetail.OrderDetailId;
+                        addNewTicket.Status = "";
+                        addNewTicket.IsCheckedIn = false;
+                        addNewTicket.CheckInDate = null;
+                        _context.Tickets.Add(addNewTicket);
+                        _context.SaveChanges();
+                    }
+                    var order = _context.Orders.FirstOrDefault(x => x.OrderId == orderId);
+                    if (order != null)
+                    {
+                        order.Status = "Đã thanh toán";
+                        _context.SaveChanges();
+                    }
+                    return Ok(new
+                    {
+                        status = 200,
+                        paymentMethod = 1
+                    });
+                } 
+                    
+                   
+            }
+            catch (System.Exception exception)
+            {
+                return Ok(new
+                {
+                    status = 400,
+                });
+            }
+
         }
 
     }
