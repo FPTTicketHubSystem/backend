@@ -275,7 +275,7 @@ namespace backend.Repositories.PaymentRepository
 
         public object CheckInputCoupon(int eventId, string coupon)
         {
-            var avaliableCoupon = _context.Discountcodes.SingleOrDefault(x => x.Code.Equals(coupon) && x.Quantity > 0);
+            var avaliableCoupon = _context.Discountcodes.SingleOrDefault(x => x.Code.Equals(coupon) && x.Quantity > 0 && x.EventId == eventId);
             if(avaliableCoupon != null)
             {
                 return new
