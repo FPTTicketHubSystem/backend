@@ -27,6 +27,8 @@ using backend.Helper;
 using DinkToPdf.Contracts;
 using DinkToPdf;
 using backend.Services.EventRatingService;
+using backend.Repositories.PostCommentRepository;
+using backend.Services.PostCommentService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,6 +102,8 @@ services.AddScoped<IStatisticService, StatisticService>();
 services.AddScoped<IForumRepository, ForumRepository>();
 services.AddScoped<IForumService, ForumService>();
 services.AddScoped<IEventRatingService, EventRatingService>();
+services.AddScoped<IPostCommentRepository, PostCommentRepository>();
+services.AddScoped<IPostCommentService, PostCommentService>();
 
 var app = builder.Build();
 

@@ -20,9 +20,9 @@ namespace backend.DTOs
         public int AccountId { get; set; }
         public int PostId { get; set; }
         public string Content { get; set; }
-       /* public string FileComment { get; set; }*/
+        public string FileComment { get; set; }
         public DateTime CommentDate { get; set; }
-       /* public string Status { get; set; }*/
+        public string Status { get; set; }
     }
     public class PostFavoriteDTO
     {
