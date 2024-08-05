@@ -13,58 +13,65 @@ namespace backend.Services.ForumService
         {
             _forumRepository = forumRepository;
         }
-        public object AddPost(PostDTO postDTO)
-        {
-            var result = _forumRepository.AddPost(postDTO);
-            return result;
-        }
-
-        public object DeletePost(int eventId)
-        {
-            var result = _forumRepository.DeletePost(eventId);
-            return result;
-        }
-
-        public object EditPost(int PostId, PostDTO postDTO)
-        {
-            var result = _forumRepository.EditPost(PostId, postDTO);
-            return result;
-        }
-
-        public Task<object> GetAllPostSaved(int iduser)
-        {
-            return _forumRepository.GetAllPostSaved(iduser);
-        }
-
         public async Task<object> GetAllPost()
         {
             return await _forumRepository.GetAllPost();
         }
-
-        public object AddCommentPost(int postId, PostCommentDTO postCommentDTO)
+        public object GetPostById(int postId)
         {
-            var result = _forumRepository.AddCommentPost(postId, postCommentDTO);
-            return result;
+            return _forumRepository.GetPostById(postId);
         }
-        public async Task<object> getcomment(int postid)
+        public object AddPost(Post post)
         {
-            return await _forumRepository.getcomment(postid);
+            return _forumRepository.AddPost(post);
         }
-
-        public async Task<object> likepost(int postId, int iduser)
+        public dynamic GetPostByStatus(string? status, int accountId)
         {
-            return await _forumRepository.likepost(postId, iduser);
+            return _forumRepository.GetPostByStatus(status, accountId);
         }
-        public object DeleteComment(int commentId)
+        public object EditPost(EditPostDTO post)
         {
-            var result = _forumRepository.DeleteComment(commentId);
-            return result;
+            return _forumRepository.EditPost(post);
         }
-
-        public object EditComment(int commentId, String Content)
+        public object DeletePost(int postId)
         {
-            var result = _forumRepository.EditComment(commentId, Content);
-            return result;
+            return _forumRepository.DeletePost(postId);
+        }
+        public object RejectPost(int postId)
+        {
+            return _forumRepository.RejectPost(postId);
+        }
+        public object SavePost(int postId, int accountId)
+        {
+            return _forumRepository.SavePost(postId, accountId);
+        }
+        public object UnsavePost(int postId, int accountId)
+        {
+            return _forumRepository.UnsavePost(postId, accountId);
+        }
+        public dynamic GetSavedPostByAccountId(int accountId)
+        {
+            return _forumRepository.GetSavedPostByAccountId(accountId);
+        }
+        public object ChangeStatusPost(int postId, string status)
+        {
+            return _forumRepository.ChangeStatusPost(postId, status);
+        }
+        public object LikePost(int postId, int accountId)
+        {
+            return _forumRepository.LikePost(postId, accountId);
+        }
+        public object UnlikePost(int postId, int accountId)
+        {
+            return _forumRepository.UnlikePost(postId, accountId);
+        }
+        public object CountLikedNumberByPost(int postId)
+        {
+            return _forumRepository.CountLikedNumberByPost(postId);
+        }
+        public object CountComment(int postId)
+        {
+            return _forumRepository.CountComment(postId);
         }
     }
 }
