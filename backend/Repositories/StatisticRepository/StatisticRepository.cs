@@ -116,7 +116,7 @@ namespace backend.Repositories.StatisticRepository
         }
         public async Task<byte[]> GenerateEventStatisticsReport()
         {
-            var totalRevenue = await GetTotalRevenue();
+            var monthlyRevenues = await GetMonthlyRevenue();
             var totalParticipants = await GetTotalParticipants();
             var topRatedEvents = await GetTopRatedEvents();
             var topRevenueEvents = await GetTopRevenueEvents();
@@ -134,8 +134,14 @@ namespace backend.Repositories.StatisticRepository
             htmlContent.AppendLine("</style>");
             htmlContent.AppendLine("</head>");
             htmlContent.AppendLine("<body>");
-            htmlContent.AppendLine("<h1>Event Statistics Report</h1>");
-            htmlContent.AppendLine($"<p>Total Revenue: {totalRevenue:C}</p>");
+            htmlContent.AppendLine("<h1>Monthly Revenue Report</h1>");
+
+            htmlContent.AppendLine("<table>");
+            htmlContent.AppendLine("<tr><th>Year</th><th>Month</th><th>Total Revenue (VND)</th></tr>");
+            foreach (var revenue in monthlyRevenues)
+            {
+                htmlContent.AppendLine($"<tr><td>{revenue.Year}</td><td>{revenue.Month}</td><td>{revenue.TotalRevenue}</td></tr>");
+            }
             htmlContent.AppendLine($"<p>Total Participants: {totalParticipants}</p>");
 
             htmlContent.AppendLine("<h2>Top 5 Rated Events</h2>");
@@ -170,18 +176,18 @@ namespace backend.Repositories.StatisticRepository
             var pdfDocument = new HtmlToPdfDocument
             {
                 GlobalSettings = {
-            ColorMode = ColorMode.Color,
-            Orientation = Orientation.Portrait,
-            PaperSize = PaperKind.A4
-        },
+                    ColorMode = ColorMode.Color,
+                    Orientation = Orientation.Portrait,
+                    PaperSize = PaperKind.A4
+                },
                 Objects = {
-            new ObjectSettings
-            {
-                PagesCount = true,
-                HtmlContent = htmlContent.ToString(),
-                WebSettings = { DefaultEncoding = "utf-8" }
-            }
-        }
+                    new ObjectSettings
+                    {
+                        PagesCount = true,
+                        HtmlContent = htmlContent.ToString(),
+                        WebSettings = { DefaultEncoding = "utf-8" }
+                    }
+                }
             };
 
             return await Task.Run(() => _converter.Convert(pdfDocument));
