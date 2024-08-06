@@ -73,5 +73,9 @@ namespace backend.Services.ForumService
         {
             return _forumRepository.CountComment(postId);
         }
+        public async Task<object> GetAllPostAdmin()
+        {
+            return await _forumRepository.GetAllPostAdmin();
+        }
     }
 }
