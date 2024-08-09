@@ -219,5 +219,19 @@ namespace backend.Controllers
             var posts = _postService.GetSavedPostByAccountId(accountId);
             return Ok(posts);
         }
+
+        [HttpGet("getAllPostAdmin")]
+        public async Task<ActionResult> GetAllPostAdmin()
+        {
+            try
+            {
+                var data = await _postService.GetAllPostAdmin();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

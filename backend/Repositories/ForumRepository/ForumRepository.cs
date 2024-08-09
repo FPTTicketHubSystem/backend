@@ -443,5 +443,32 @@ namespace backend.Repositories.ForumRepository
                 };
             }
         }
+
+        public async Task<object> GetAllPostAdmin()
+        {
+            var data = await _context.Posts
+                .Include(p => p.Account)
+                .Include(p => p.Postcomments)
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p => new
+                {
+                    p.PostId,
+                    p.AccountId,
+                    p.Account.Avatar,
+                    p.Account.FullName,
+                    p.PostText,
+                    p.PostFile,
+                    p.Status,
+                    p.CreateDate,
+                    p.Postlikes,
+                    p.Postfavorites,
+                    countComment = p.Postcomments.Count(),
+                    countLike = p.Postlikes.Count(),
+                })
+                .ToListAsync();
+
+            return data;
+        }
+
     }
 }
