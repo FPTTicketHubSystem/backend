@@ -5,6 +5,7 @@ using backend.Services.NewsService;
 using backend.Services.PaymentService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Net.payOS;
 using Net.payOS.Types;
 
@@ -99,6 +100,34 @@ namespace backend.Controllers
             try
             {
                 var result = _paymentService.CheckInputCoupon(eventId, coupon);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("CheckOrderdOfUser")]
+        public async Task<ActionResult> CheckOrderdOfUser(int userId, int eventId)
+        {
+            try
+            {
+                var result = _paymentService.CheckOrderdOfUser(userId, eventId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("CancelOrderOfUser")]
+        public async Task<ActionResult> CancelOrderOfUser(int userId)
+        {
+            try
+            {
+                var result = _paymentService.CancelOrderOfUser(userId);
                 return Ok(result);
             }
             catch

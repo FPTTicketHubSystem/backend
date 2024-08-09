@@ -3,6 +3,7 @@ using backend.DTOs;
 using backend.Helper;
 using backend.Models;
 using backend.Repositories.EventRepository;
+using Net.payOS.Types;
 using Org.BouncyCastle.Asn1.X9;
 using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
@@ -19,7 +20,7 @@ namespace backend.Repositories.PaymentRepository
         }
         public object Payment(PaymentDTO paymentDTO)
         {
-            DateTime dateTime = DateTime.UtcNow;    
+            DateTime dateTime = DateTime.UtcNow;
             Order orderSignUp = new Order();
             Payment paymentSignUp = new Payment();
             decimal paymentAmount = 0;
@@ -116,7 +117,7 @@ namespace backend.Repositories.PaymentRepository
                     status = 400,
                 };
             }
-            
+
         }
 
         public object ReturnPaymentUrl(HttpContext context, int _orderId, string _discounrCode)
@@ -130,7 +131,7 @@ namespace backend.Repositories.PaymentRepository
             Discountcode discountCode = _context.Discountcodes.SingleOrDefault(x => x.Code == _discounrCode);
 
             if (string.IsNullOrEmpty(vnp_TmnCode) || string.IsNullOrEmpty(vnp_HashSecret))
-            { 
+            {
                 return new
                 {
                     message = "Vui lòng cấu hình các tham số: vnp_TmnCode,vnp_HashSecret trong file web.config",
@@ -143,7 +144,7 @@ namespace backend.Repositories.PaymentRepository
             if (discountCode != null)
             {
                 paymentSignUp.DiscountCodeId = discountCode.DiscountCodeId;
-                paymentSignUp.PaymentAmount = _order.Total * (discountCode.DiscountAmount/100);
+                paymentSignUp.PaymentAmount = _order.Total * (discountCode.DiscountAmount / 100);
             }
             else
             {
@@ -179,9 +180,9 @@ namespace backend.Repositories.PaymentRepository
         public object PaymentExcute(IQueryCollection collections)
         {
             var vnpay = new VnPayLibrary();
-            foreach(var (key, value) in collections)
+            foreach (var (key, value) in collections)
             {
-                if(!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
+                if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
                 {
                     vnpay.AddResponseData(key, value.ToString());
                 }
@@ -192,9 +193,9 @@ namespace backend.Repositories.PaymentRepository
             var vnp_ResponseCode = vnpay.GetResponseData("vnp_ResponseCode");
             var vnp_OrderInfo = vnpay.GetResponseData("vnp_OrderInfo");
             bool checkSignature = vnpay.ValidateSignature(vnp_SecureHash, "8BNW3HO6R9QA8W8HDLWCET6TJLP6WDU5");
-            if(checkSignature)
+            if (checkSignature)
             {
-                
+
                 var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == Convert.ToInt32(vnp_orderId)).ToList();
                 foreach (var orderDetail in getOrderDetail)
                 {
@@ -218,7 +219,7 @@ namespace backend.Repositories.PaymentRepository
                     VnPayResponse = vnp_ResponseCode
                 };
             }
-            
+
             return new
             {
                 status = 400,
@@ -262,7 +263,7 @@ namespace backend.Repositories.PaymentRepository
                     message = "Delete success",
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new
                 {
@@ -270,13 +271,13 @@ namespace backend.Repositories.PaymentRepository
                     message = "Delete failed",
                 };
             }
-            
+
         }
 
         public object CheckInputCoupon(int eventId, string coupon)
         {
             var avaliableCoupon = _context.Discountcodes.SingleOrDefault(x => x.Code.Equals(coupon) && x.Quantity > 0 && x.EventId == eventId);
-            if(avaliableCoupon != null)
+            if (avaliableCoupon != null)
             {
                 return new
                 {
@@ -284,7 +285,8 @@ namespace backend.Repositories.PaymentRepository
                     message = "Avaliable coupon",
                     discountAmount = avaliableCoupon.DiscountAmount,
                 };
-            } else
+            }
+            else
             {
                 return new
                 {
@@ -292,6 +294,75 @@ namespace backend.Repositories.PaymentRepository
                     message = "Sold out coupon",
                 };
             }
+
+        }
+
+        public object CancelOrderOfUser(int userId)
+        {
+            try
+            {
+                Order latstestOrder = _context.Orders
+                                      .Where(x => x.AccountId == userId && x.Status.Equals("Đang xử lý"))
+                                      .OrderByDescending(x => x.OrderId)
+                                      .FirstOrDefault();
+                //var existOrder = 0;
+                if(latstestOrder != null)
+                {
+                    var deleteOrderDetails = _context.Orderdetails.Where(x => x.OrderId == latstestOrder.OrderId).ToList();
+                    foreach (var deleteOrderDetail in deleteOrderDetails)
+                    {
+                        var returnQuantityOfTicket = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == deleteOrderDetail.TicketTypeId);
+                        if (returnQuantityOfTicket != null)
+                        {
+                            returnQuantityOfTicket.Quantity += deleteOrderDetail.Quantity;
+                            _context.SaveChanges();
+                        }
+                        _context.Orderdetails.Remove(deleteOrderDetail);
+                        _context.SaveChanges();
+                    }
+                    latstestOrder.Status = "Đã hủy vé";
+                    _context.SaveChanges();
+                    //existOrder = 1;
+                }
+                return new
+                {
+                    status = 200,
+                    message = "Reverse success",
+                    //existOrder = existOrder,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    status = 400,
+                    message = "Reverse failed",
+                };
+            }
+        }
+
+        public object CheckOrderdOfUser(int userId, int eventId)
+        {
+            var getOrdered = _context.Orders.SingleOrDefault(x => x.AccountId == userId && (x.Status == "Đang xử lý" || x.Status == "Đã thanh toán"));
+            if (getOrdered != null)
+            {
+                var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == getOrdered.OrderId).FirstOrDefault();
+                var getTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == getOrderDetail.TicketTypeId && x.EventId == eventId);
+                if (getTicketType != null)
+                {
+                    var result = CancelOrderOfUser(userId);
+                    return new
+                    {
+                        status = 200,
+                        message = "Đang xử lý",
+                    };
+                }
+            }
+            return new
+            {
+                status = 400,
+                message = "Chưa đặt vé",
+            };
 
         }
     }
