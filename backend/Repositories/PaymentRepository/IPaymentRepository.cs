@@ -12,5 +12,7 @@ namespace backend.Repositories.PaymentRepository
         object PaymentExcute(IQueryCollection collections);
         object DeleteTimeOutOrder(PaymentDTO paymentDTO);
         object CheckInputCoupon(int eventId, string coupon);
+        object CancelOrderOfUser(int userId);
+        object CheckOrderdOfUser(int userId, int eventId);
     }
 }
