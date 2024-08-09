@@ -1,16 +1,17 @@
-﻿using backend.Models;
+﻿using backend.DTOs;
+using backend.Models;
 
 namespace backend.Services.StatisticService
 {
     public interface IStatisticService
     {
-        Task<decimal> GetTotalRevenue();
-        Task<int> GetTotalParticipants();
-        Task<IEnumerable<MonthlyRevenueDto>> GetMonthlyRevenue();
-        Task<IEnumerable<MonthlyParticipantsDto>> GetMonthlyParticipants();
-        Task<IEnumerable<EventRatingDto>> GetTopRatedEvents();
-        Task<IEnumerable<EventRevenueDto>> GetTopRevenueEvents();
-        Task<IEnumerable<EventParticipantsDto>> GetTopParticipantsEvents();
+        Task<IEnumerable<MonthlyRevenueDTO>> GetMonthlyRevenue();
+        Task<IEnumerable<MonthlyRegisteredUsersDTO>> GetMonthlyActiveUsers();
+        Task<IEnumerable<TopRatedEventDTO>> GetTopRatedEvents();
+        Task<IEnumerable<EventRevenueDTO>> GetEventRevenue();
+        Task<IEnumerable<TopParticipantsDTO>> GetTopParticipants();
+        Task<IEnumerable<TopRevenueEventDTO>> GetTopRevenueEvents();
+        Task<IEnumerable<TopParticipantsEventDTO>> GetTopParticipantsEvents();
         Task<byte[]> GenerateEventStatisticsReport();
     }
 }
