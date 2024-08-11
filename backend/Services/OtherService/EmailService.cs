@@ -30,7 +30,7 @@ namespace backend.Services.OtherService
                 string subject = "";
                 if (type == 1)
                 {
-                    _text = EmailHelper.Instance.RegisterMail(fullname, account);
+                    _text = EmailHelper.Instance.RegisterMail(fullname, account, mail);
                     subject = "Đăng ký tài khoản FPTTicketHub - Xác nhận tài khoản";
                 }
                 if (type == 2)
@@ -116,7 +116,7 @@ namespace backend.Services.OtherService
             }
         }
 
-        public async Task<bool> SendTicketEmail(string mail, string fullName, int ticketId, string ticketType, int quantity, int orderId, decimal paymentAmount, string eventName, DateTime eventStartTime, string eventLocation, string eventAddress)
+        public async Task<bool> SendTicketEmail(string mail, string fullName, int ticketId, string ticketType, int quantity, string orderId, string paymentAmount, string eventName, DateTime eventStartTime, string eventLocation, string eventAddress)
         {
             try
             {
@@ -125,6 +125,46 @@ namespace backend.Services.OtherService
                 _text = EmailHelper.Instance.TicketEmail(fullName, ticketId, ticketType, quantity, orderId, paymentAmount, eventName, eventStartTime, eventLocation, eventAddress);
                 subject = $"FPTTicketHub - Vé điện tử cho đơn hàng {orderId}";
 
+
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));
+                email.To.Add(MailboxAddress.Parse(mail));
+                email.Subject = subject;
+                email.Body = new TextPart(TextFormat.Html)
+                {
+                    Text = _text
+                };
+                var smtp = new SmtpClient();
+                await smtp.ConnectAsync("smtp.gmail.com", 587, false);
+                await smtp.AuthenticateAsync("fpttickethub@gmail.com", "urjiyqjypwkfazec");
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+        }
+        public async Task<bool> SendEventApproveEmail(string mail, int type, string fullname, string eventName)
+        {
+            try
+            {
+                // With type == 1, the first event by an account is approved, the account is become organizer
+                // With type == 2, event approved
+                string _text = "";
+                string subject = "";
+                if (type == 1)
+                {
+                    _text = EmailHelper.Instance.ApprovedEventFirstTimeEmail(mail, fullname, eventName);
+                    subject = "FPTTicketHub - Bạn đã trở thành ban tổ chức";
+                }
+                if (type == 2)
+                {
+                    _text = EmailHelper.Instance.ApprovedEventEmail(mail, fullname, eventName);
+                    subject = "FPTTicketHub - Sự kiện của bạn đã được duyệt";
+                }
 
                 var email = new MimeMessage();
                 email.From.Add(MailboxAddress.Parse("fpttickethub@gmail.com"));

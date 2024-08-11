@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using backend.Models;
+using static backend.Repositories.EventRepository.EventRepository;
 
 namespace backend.Services.EventService
 {
@@ -16,5 +17,17 @@ namespace backend.Services.EventService
         Task<object> ChangeEventStatus(int eventId, string status);
         Task<object> GetEventByAccount(int accountId);
         object GetEventForEdit(int eventId);
+        //update for organizer manage
+        Task<object> GetTicketTypeByEvent(int eventId);
+        Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity);
+        Task<object> GetDiscountCodeByEvent(int eventId);
+        object AddDiscountCode(DiscountCodeDTO discountcode);
+        Task<object> UpdateDiscountQuantity(int discountId, int addQuantity);
+        int GetNumberOfTicketSold(int eventId);
+        decimal GetTotalRevenue(int eventId);
+        int GetActualParticipants(int eventId);
+        Task<List<TicketSalesPerTicketType>> GetTicketSalesPerTicketType(int eventId);
+        Task<object> GetEventStatus(int eventId);
+        Task<object> GetAverageRating(int eventId);
     }
 }

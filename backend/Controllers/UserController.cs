@@ -1,6 +1,7 @@
 ﻿using backend.DTOs;
 using backend.Models;
 using backend.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -39,6 +40,7 @@ namespace backend.Controllers
             }
         }
 
+        [Authorize(Roles = "Organizer,User,Amin,OrganizerStaff")]
         [HttpPost("changePassword")]
         public async Task<ActionResult> ChangePassword(int accountId, string newPassword)
         {
@@ -64,6 +66,7 @@ namespace backend.Controllers
             catch { return BadRequest(); }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("ChangeStatusUser")]
         public async Task<ActionResult> ChangeStatusUser(int accountId, string newStatus)
         {
@@ -78,6 +81,7 @@ namespace backend.Controllers
             }
         }
 
+        
         [HttpGet("getPhoneWithoutThisPhone")]
         public async Task<ActionResult> GetPhoneWithoutThisPhone(string phone)
         {
@@ -91,6 +95,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpGet("getAllAccountUser")]
         public async Task<ActionResult> GetAllAccountUser()
         {
@@ -104,6 +109,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost("changeRole")]
         public async Task<ActionResult> ChangeRole(int accountId, int newRoleId)
         {

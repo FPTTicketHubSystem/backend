@@ -1,4 +1,5 @@
 ﻿using backend.Services.StaffService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +7,7 @@ namespace backend.Controllers
 {
     [Route("api/staff")]
     [ApiController]
+    [Authorize(Roles = "OrganizerStaff")]
     public class StaffController : ControllerBase
     {
         private readonly IStaffService _staffService;

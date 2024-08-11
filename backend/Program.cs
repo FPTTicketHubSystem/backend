@@ -29,6 +29,9 @@ using DinkToPdf;
 using backend.Services.EventRatingService;
 using backend.Repositories.PostCommentRepository;
 using backend.Services.PostCommentService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +43,30 @@ var builder = WebApplication.CreateBuilder(args);
 //        listenOptions.UseHttps(); // HTTPS
 //    });
 //});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = builder.Configuration["Jwt:Key"];
+        var issuer = builder.Configuration["Jwt:Issuer"];
+        var audience = builder.Configuration["Jwt:Audience"];
+
+        if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
+        {
+            throw new ArgumentNullException("jwt config values are missing.");
+        }
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        };
+    });
 
 
 // Add services to the container.
@@ -61,6 +88,7 @@ builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServ
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddHostedService<EmailReminderService>();
 builder.Services.AddHostedService<EmailRatingService>();
+builder.Services.AddHostedService<StaffRemoveService>();
 builder.Services.AddLogging();
 
 // Add CORS
@@ -108,11 +136,11 @@ services.AddScoped<IPostCommentService, PostCommentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -123,6 +151,7 @@ app.UseCors("CorsPolicy");
 
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
