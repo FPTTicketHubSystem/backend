@@ -96,7 +96,7 @@ namespace backend.Repositories.UserRepository
                 var newAccount = new Account();
                 newAccount.FullName = register.FullName;
                 newAccount.Email = register.Email;
-                newAccount.CreateDate = DateTime.Now;   
+                newAccount.CreateDate = DateTime.UtcNow;   
                 newAccount.Status = "Đang hoạt động";
                 newAccount.Avatar = register.Avatar;
                 newAccount.RoleId = 2;
@@ -189,7 +189,7 @@ namespace backend.Repositories.UserRepository
             account.FullName = register.FullName;
             account.Email = register.Email;
             account.Phone = register.PhoneNumber;
-            account.CreateDate = DateTime.Now;
+            account.CreateDate = DateTime.UtcNow;
             //account.Status = "Chờ xác thực";
             if (register.Status == null)
             {
@@ -262,7 +262,7 @@ namespace backend.Repositories.UserRepository
                 issuer: config.GetSection("Jwt:Issuer").Value,
                 audience: config.GetSection("Jwt:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return "Bearer " + jwt;

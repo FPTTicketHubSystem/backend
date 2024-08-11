@@ -315,7 +315,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .Where(e => e.Status == "Đã duyệt" && e.StartTime > DateTime.Now)
+                .Where(e => e.Status == "Đã duyệt" && e.StartTime > DateTime.UtcNow)
                 .OrderByDescending(e => e.StartTime)
                 .Take(5)
                 .Select(e =>
@@ -605,7 +605,7 @@ namespace backend.Repositories.EventRepository
             {
                 return new { status = 404, message = "NotFound" };
             }
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             string eventStatus;
 
             if (now < eventInfo.StartTime)

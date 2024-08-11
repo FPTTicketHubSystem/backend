@@ -121,7 +121,7 @@ namespace backend.Repositories.EventStaffRepository
         {
             var data = _context.Events
                 .Include(e => e.Eventstaffs)
-                .Where(e => e.AccountId == organizerId && e.Status == "Đã duyệt" && e.EndTime < DateTime.Now)
+                .Where(e => e.AccountId == organizerId && e.Status == "Đã duyệt" && e.EndTime < DateTime.UtcNow)
                 .OrderByDescending(e => e.StartTime)
                 .Select(e =>
                 new
