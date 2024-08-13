@@ -15,342 +15,460 @@ namespace backend.Repositories.ForumRepository
         {
             _context = context;
         }
+        public async Task<object> GetAllPost()
+        {
+            var data = _context.Posts
+                .Include(p => p.Account)
+                .Include(p => p.Postcomments)
+                .Where(p => p.Status == "Đã duyệt")
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p =>
+              new
+              {
+                  p.PostId,
+                  p.AccountId,
+                  p.Account.Avatar,
+                  p.Account.FullName,
+                  p.PostText,
+                  p.PostFile,
+                  p.Status,
+                  p.CreateDate,
+                  p.Postlikes,
+                  p.Postfavorites,
+                  countComment = p.Postcomments.Count(),
+                  countLike = p.Postlikes.Count(),
 
-        public object AddPost(PostDTO postDTO)
+              });
+            return data;
+        }
+        public object GetPostById(int postId)
+        {
+            var data = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
+        }
+        public object AddPost(Post post)
         {
             try
             {
-                var newPost = new Post
-                {
-                    AccountId = postDTO.AccountId, //cái ni lấy trong user.AccountId UserContext
-                    PostFile = postDTO.PostFile, //cái ni up cái ảnh firebase vô 
-                    PostText = postDTO.PostText, //ni nhập ô text
-                    CreateDate = DateTime.Now, //thì chưa làm lại frontend mà, làm một state sẽ chứa object đi xuống đi, rồi lấy mấy cái như t cmt ở trên đó làm thử xem với chứ giwof mò tới sang
-
-                    Status = "Chờ duyệt",
-
-                };
-
-                _context.Posts.Add(newPost);
+                _context.Add(post);
                 _context.SaveChanges();
-
                 return new
                 {
-                    message = "Event Added",
-                    status = 200,
-                    newPost
+                    message = "Add post successfully",
+                    post,
+                    status = 200
                 };
             }
             catch
             {
                 return new
                 {
-                    message = "Add Event Fail",
+                    message = "Add post fail",
                     status = 400
                 };
             }
         }
-
+        public dynamic GetPostByStatus(string? status, int accountId)
+        {
+            var checkAccount = _context.Accounts.SingleOrDefault(a => a.AccountId == accountId);
+            if (checkAccount.RoleId == 1 || checkAccount.RoleId == 2)
+            {
+                var posts = _context.Posts
+                .Include(p => p.Postcomments)
+                .Include(p => p.Postlikes)
+                .Where(p => p.Status == status)
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p =>
+             new
+             {
+                 p.PostId,
+                 p.Account.FullName,
+                 p.Account.Avatar,
+                 p.PostText,
+                 p.PostFile,
+                 p.Status,
+                 p.CreateDate,
+                 p.Postlikes,
+                 p.Postfavorites,
+                 countComment = p.Postcomments.Count(),
+                 countLike = p.Postlikes.Count()
+             });
+                return posts;
+            }
+            else
+            {
+                var posts = _context.Posts
+                .Include(p => p.Postcomments)
+                .Include(p => p.Postlikes)
+                .Where(p => p.Status == status && p.AccountId == accountId)
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p =>
+                    new
+                    {
+                        p.PostId,
+                        p.Account.FullName,
+                        p.Account.Avatar,
+                        p.PostText,
+                        p.PostFile,
+                        p.Status,
+                        p.CreateDate,
+                        p.Postlikes,
+                        p.Postfavorites,
+                        countComment = p.Postcomments.Count(),
+                        countLike = p.Postlikes.Count()
+                    }); ;
+                return posts;
+            }
+        }
+        public object EditPost(EditPostDTO post)
+        {
+            try
+            {
+                var editPost = _context.Posts.SingleOrDefault(x => x.PostId == post.PostId);
+                if (editPost == null)
+                {
+                    return new
+                    {
+                        message = "Post Not Found",
+                        status = 200,
+                    };
+                }
+                editPost.PostText = post.PostText;
+                editPost.PostFile = post.PostFile;
+                editPost.Status = "Đã duyệt";
+                _context.SaveChanges();
+                return new
+                {
+                    message = "Post edited successfully",
+                    status = 200,
+                    editPost,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Comment edited failed",
+                    status = 400,
+                };
+            }
+        }
         public object DeletePost(int postId)
         {
-            try
-            {
-                // Find the post in the database
-                var postToDelete = _context.Posts.Find(postId);
-
-                if (postToDelete == null)
-                {
-                    return new
-                    {
-                        message = "Post not found",
-                        status = 404
-                    };
-                }
-
-                // Delete related comments first
-                var relatedComments = _context.Postcomments.Where(pc => pc.PostId == postId);
-                _context.Postcomments.RemoveRange(relatedComments);
-
-                var relatedFavorites = _context.Postfavorites.Where(pf => pf.PostId == postId);
-                _context.Postfavorites.RemoveRange(relatedFavorites);
-
-                // Remove the post from the context
-                _context.Posts.Remove(postToDelete);
-                _context.SaveChanges();
-
-                return new
-                {
-                    message = "Post deleted successfully",
-                    status = 200
-                };
-            }
-            catch (Exception ex)
+            var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (post == null)
             {
                 return new
                 {
-                    message = $"Delete post failed: {ex.Message}",
+                    message = "The post doesn't exist in database",
                     status = 400
                 };
             }
-        }
-
-
-
-
-        public object EditPost(int postId, PostDTO updatedPostDto)
-        {
-            try
+            else
             {
-                // Find the post in the database
-                var postToUpdate = _context.Posts.Find(postId);
-
-                if (postToUpdate == null)
-                {
-                    return new
-                    {
-                        message = "Post not found",
-                        status = 404
-                    };
-                }
-
-                //Update properties with new values
-                postToUpdate.PostFile = updatedPostDto.PostFile;
-                postToUpdate.PostText = updatedPostDto.PostText;
-                postToUpdate.Status = updatedPostDto.Status;
-
-                //Save changes to the database
+                post.Status = "Deleted";
                 _context.SaveChanges();
-
                 return new
                 {
-                    message = "Post updated successfully",
                     status = 200,
-                    updatedPost = postToUpdate
+                    message = "Post deleted successfully!"
                 };
+            }
+        }
+        public object RejectPost(int postId)
+        {
+            var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (post == null || post.Status != "Pending")
+            {
+                return new
+                {
+                    message = "The post doesn't exist in database or has been approved",
+                    status = 400
+                };
+            }
+            else
+            {
+                post.Status = "Rejected";
+                _context.SaveChanges();
+                return new
+                {
+                    status = 200,
+                    message = "The post has been rejected to upload!"
+                };
+            }
+        }
+        public object SavePost(int postId, int accountId)
+        {
+            var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (post == null)
+            {
+                return new
+                {
+                    message = "The post doesn't exist in the database",
+                    status = 400
+                };
+            }
+            else
+            {
+                var postSave = new Postfavorite
+                {
+                    AccountId = accountId,
+                    PostId = postId,
+                    Status = "Saved"
+                };
+                var checkExist = _context.Postfavorites.Any(c => c.PostId == postId && c.AccountId == accountId);
+                {
+                    if (checkExist)
+                    {
+                        return new
+                        {
+                            message = "This account has saved this post before!"
+                        };
+                    }
+                    else
+                    {
+                        _context.Postfavorites.Add(postSave);
+                        _context.SaveChanges();
+
+                        return new
+                        {
+                            status = 200,
+                            postSave,
+                            message = "Post saved"
+                        };
+                    }
+                }
+            }
+        }
+        public object UnsavePost(int postId, int accountId)
+        {
+            var postUnsave = _context.Postfavorites.SingleOrDefault(x => x.PostId == postId && x.AccountId == accountId);
+            if (postUnsave == null)
+            {
+                return new
+                {
+                    message = "This account has not saved this post before!",
+                    status = 400
+                };
+            }
+            else
+            {
+                _context.Postfavorites.Remove(postUnsave);
+                _context.SaveChanges();
+                return new
+                {
+                    status = 200,
+                    message = "Unsave post successfully!"
+                };
+            }
+        }
+        public dynamic GetSavedPostByAccountId(int accountId)
+        {
+            try
+            {
+                var posts = _context.Postfavorites
+                    .Include(p => p.Post)
+                    .Where(p => p.AccountId == accountId && p.Status == "Saved" && p.Post.Status == "Approved")
+                    .OrderByDescending(p => p.Post.CreateDate)
+                    .Select(p =>
+                new
+                {
+                    p.PostId,
+                    p.AccountId,
+                    p.Account.FullName,
+                    p.Account.Avatar,
+                    p.Post.PostText,
+                    p.Post.PostFile,
+                    p.Post.Status,
+                    p.Post.CreateDate,
+                    p.Post.Postlikes,
+                    p.Post.Postfavorites,
+                    countComment = p.Post.Postcomments.Count(),
+                    countLike = p.Post.Postlikes.Count()
+                });
+                return posts;
             }
             catch (Exception ex)
             {
                 return new
                 {
-                    message = $"Update post failed: {ex.Message}",
-                    status = 400
+                    message = "This account has not saved any post before!"
                 };
             }
         }
-
-        //public Task<object> FindPost()
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        public async Task<object> GetAllPost()
+        public object ChangeStatusPost(int postId, string status)
         {
-            var data = _context.Posts
-                 .Include(e => e.Account)
-                 .Include(e => e.Postcomments)
-                 .Include(e => e.Postlikes)
-                 .OrderByDescending(e => e.CreateDate)
-                 .Select(e =>
-                 new
-                 {
-                     e.PostId,
-                     e.Account.AccountId,
-                     e.PostFile,
-                     e.PostText,
-                     e.Account.FullName,
-                     e.Account.Avatar,
-                     e.CreateDate,
-                     e.Status,
-                     e.Postcomments.Count,
-                 });
-            return data;
+            var updateStatus = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (updateStatus == null)
+            {
+                return new
+                {
+                    message = "The post doesn't exist in database",
+                    status = 400
+                };
+            }
+            else
+            {
+                updateStatus.Status = status;
+                _context.SaveChanges();
+                return new
+                {
+                    status = 200,
+                    updateStatus,
+                    message = "Post Update successfully!"
+                };
+            }
         }
+        public object LikePost(int postId, int accountId)
+        {
+            var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+            if (post == null)
+            {
+                return new
+                {
+                    message = "The post doesn't exist in the database",
+                    status = 400
+                };
+            }
+            else
+            {
+                var postlike = new Postlike
+                {
+                    AccountId = accountId,
+                    PostId = postId,
+                    LikeDate = DateTime.Now
+                };
+                var checkExist = _context.Postlikes.Any(c => c.PostId == postId && c.AccountId == accountId);
+                {
+                    if (checkExist)
+                    {
+                        return new
+                        {
+                            message = "This account has liked this post before!"
+                        };
+                    }
+                    else
+                    {
+                        _context.Postlikes.Add(postlike);
+                        _context.SaveChanges();
 
-        public object AddCommentPost(int postId, PostCommentDTO postCommentDTO)
+                        return new
+                        {
+                            status = 200,
+                            postlike,
+                            message = "Post liked"
+                        };
+                    }
+                }
+            }
+        }
+        public object UnlikePost(int postId, int accountId)
+        {
+            var postUnlike = _context.Postlikes.SingleOrDefault(x => x.PostId == postId && x.AccountId == accountId);
+            if (postUnlike == null)
+            {
+                return new
+                {
+                    message = "This account has not liked this post before!",
+                    status = 400
+                };
+            }
+            else
+            {
+                _context.Postlikes.Remove(postUnlike);
+                _context.SaveChanges();
+                return new
+                {
+                    status = 200,
+                    message = "Unlike post successfully!"
+                };
+            }
+        }
+        public object CountLikedNumberByPost(int postId)
         {
             try
             {
-                // Find the post in the database
-                var post = _context.Posts.Find(postId);
-
+                var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+                var countLiked = _context.Postlikes.Where(x => x.PostId == postId).Count();
                 if (post == null)
                 {
                     return new
                     {
-                        message = "Post not found",
-                        status = 404
+                        message = "Cannot find this post",
+                        status = 200,
                     };
                 }
-
-                var newComment = new Postcomment()
-                {
-                    AccountId = postCommentDTO.AccountId,
-                    PostId = postId, // Assign postId directly from method parameter
-                    Content = postCommentDTO.Content,
-                    CommentDate = DateTime.Now,
-
-                };
-
-                // Initialize Postcomments collection if null
-                if (post.Postcomments == null)
-                {
-                    post.Postcomments = new List<Postcomment>();
-                }
-
-                // Add the new comment to the post's comments collection
-                post.Postcomments.Add(newComment);
-
-                _context.Posts.Update(post);
-                _context.SaveChanges();
-
                 return new
                 {
-                    message = $"Comment added successfully!",
-                    status = 200
-                };
-            }
-            catch (Exception ex)
-            {
-                return new
-                {
-                    message = $"Error adding comment: {ex.Message}",
-                    status = 500 // or another appropriate error status code
-                };
-            }
-        }
-
-        public async Task<object> getcomment(int postId)
-        {
-            var post = _context.Postcomments.Where(pf => pf.PostId == postId);
-
-            return post;
-          }
-  
-
-        public async Task<object> likepost(int postId, int iduser)
-        {
-            /*ICollection < Postfavorite > pv = new List<Postfavorite>();*/
-            var post = _context.Posts.Find(postId);
-            var favpost = _context.Postfavorites
-            .FirstOrDefault(pf => pf.PostId == postId && pf.AccountId == iduser);
-            if (favpost != null)
-            {
-                if (favpost.Status == "like")
-                {
-                    favpost.Status = "unlike";
-                }
-                else
-                {
-                    favpost.Status = "like";
-                }
-                _context.Postfavorites.Update(favpost);
-            }
-            else
-            {
-                Postfavorite like = new Postfavorite();
-                like.Status = "like";
-                like.PostId = postId;
-                like.AccountId = iduser;
-                _context.Postfavorites.Add(like);
-            }
-            _context.SaveChanges();
-
-
-            return new
-            {
-                message = $"Like added successfully!",
-                status = 200
-            };
-        }
-
-        public object DeleteComment(int commentId)
-        {
-            try
-            {
-                // Find the post in the database
-                var deleteComment = _context.Postcomments.Find(commentId);
-
-                if (deleteComment == null)
-                {
-                    return new
-                    {
-                        message = "Post not found",
-                        status = 404
-                    };
-                }
-
-                // Remove the post from the context
-                _context.Postcomments.Remove(deleteComment);
-                _context.SaveChanges();
-
-                return new
-                {
-                    message = "Post deleted successfully",
-                    status = 200
-                };
-            }
-            catch (Exception ex)
-            {
-                return new
-                {
-                    message = $"Delete post failed: {ex.Message}",
-                    status = 400
-                };
-            }
-        }
-
-
-
-        public object EditComment(int commentId, String Content)
-        {
-            try
-            {
-                // Find the post in the database
-                var postToUpdate = _context.Postcomments.Find(commentId);
-
-                if (postToUpdate == null)
-                {
-                    return new
-                    {
-                        message = "Post not found",
-                        status = 404
-                    };
-                }
-                postToUpdate.Content = Content;
-
-                //Save changes to the database
-                _context.SaveChanges();
-
-                return new
-                {
-                    message = "Post updated successfully",
                     status = 200,
-                    updatedPost = postToUpdate
+                    countLiked,
                 };
             }
-            catch (Exception ex)
+            catch
             {
                 return new
                 {
-                    message = $"Update post failed: {ex.Message}",
-                    status = 400
+                    status = 400,
+                };
+            }
+        }
+        public object CountComment(int postId)
+        {
+            try
+            {
+                var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
+                var countComment = _context.Postcomments.Where(x => x.PostId == postId).Count();
+                if (post == null)
+                {
+                    return new
+                    {
+                        message = "Cannot find this post",
+                        status = 200,
+                    };
+                }
+                return new
+                {
+                    countComment,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    status = 400,
                 };
             }
         }
 
-        public async Task<object> GetAllPostSaved(int userId)
+        public async Task<object> GetAllPostAdmin()
         {
-            var postfv = _context.Postfavorites
-             .Where(pf => pf.AccountId == userId && pf.Status == "like")
-             .ToList();
-            List<Post> listpost = new List<Post>();
-            foreach (var post in postfv)
-            {
-                Post p = new Post();
-                p = await _context.Posts.FirstOrDefaultAsync(p => p.PostId == post.PostId);
-                listpost.Add(p);
-            }
-            return postfv;
+            var data = await _context.Posts
+                .Include(p => p.Account)
+                .Include(p => p.Postcomments)
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p => new
+                {
+                    p.PostId,
+                    p.AccountId,
+                    p.Account.Avatar,
+                    p.Account.FullName,
+                    p.PostText,
+                    p.PostFile,
+                    p.Status,
+                    p.CreateDate,
+                    p.Postlikes,
+                    p.Postfavorites,
+                    countComment = p.Postcomments.Count(),
+                    countLike = p.Postlikes.Count(),
+                })
+                .ToListAsync();
+
+            return data;
         }
+
     }
 }

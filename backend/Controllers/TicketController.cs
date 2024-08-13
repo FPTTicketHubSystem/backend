@@ -1,5 +1,6 @@
 ﻿using backend.Services.NewsService;
 using backend.Services.TicketService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,7 @@ namespace backend.Controllers
 {
     [Route("api/ticket")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class TicketController : ControllerBase
     {
         private readonly ITicketService _ticketService;

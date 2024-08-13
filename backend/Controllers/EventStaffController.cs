@@ -1,14 +1,17 @@
-﻿using backend.DTOs;
+using backend.DTOs;
 using backend.Models;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
+
     [Route("api/eventStaff")]
     [ApiController]
+    [Authorize(Roles = "Organizer")]
     public class EventStaffController : ControllerBase
     {
         private readonly IEventStaffService _eventStaffService;
@@ -33,13 +36,40 @@ namespace backend.Controllers
             }
         }
 
-        //GET: api/eventStaff
-        [HttpGet("getStaffByEvent")]
-        public async Task<ActionResult> GetStaffByEvent(int eventId)
+        [HttpPost("addStaffByEmail")]
+        public async Task<ActionResult> AddStaffByEmail(string email, int eventId)
         {
             try
             {
-                var data = await _eventStaffService.GetStaffByEvent(eventId);
+                var result = _eventStaffService.AddStaffByEmail(email , eventId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete("deleteStaff")]
+        public async Task<ActionResult> DeleteStaff (int staffId, int eventId)
+        {
+            try
+            {
+                var result = _eventStaffService.DeleteStaff(staffId, eventId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+        //GET: api/eventStaff
+        [HttpGet("getUpcomingEventByOrganizer")]
+        public async Task<ActionResult> GetUpcomingEventByOrganizer(int organizerId)
+        {
+            try
+            {
+                var data = await _eventStaffService.GetUpcomingEventByOrganizer(organizerId);
                 return Ok(data);
             }
             catch
@@ -48,14 +78,14 @@ namespace backend.Controllers
             }
         }
 
-        //POST: api/eventStaff
-        [HttpPost("approveStaff")]
-        public async Task<ActionResult> ApproveStaff(int accountId, int eventId, string status)
+        //GET: api/eventStaff
+        [HttpGet("getStaffByEvent")]
+        public async Task<ActionResult> GetStaffByEvent(int eventId)
         {
             try
             {
-                var result = _eventStaffService.ApproveStaff(accountId, eventId, status);
-                return Ok(result);
+                var data = await _eventStaffService.GetStaffByEvent(eventId);
+                return Ok(data);
             }
             catch
             {

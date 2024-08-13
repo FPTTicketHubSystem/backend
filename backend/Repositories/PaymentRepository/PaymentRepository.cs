@@ -150,7 +150,7 @@ namespace backend.Repositories.PaymentRepository
             {
                 paymentSignUp.PaymentAmount = _order.Total;
             }
-            paymentSignUp.PaymentDate = DateTime.Now;
+            paymentSignUp.PaymentDate = DateTime.UtcNow;
             paymentSignUp.PaymentMethodId = 2;
             string locale = "vn";
             VnPayLibrary vnpay = new VnPayLibrary();
@@ -163,7 +163,7 @@ namespace backend.Repositories.PaymentRepository
             vnpay.AddRequestData("vnp_CurrCode", "VND");
             vnpay.AddRequestData("vnp_IpAddr", Utils.GetIpAddress(context));
             vnpay.AddRequestData("vnp_Locale", locale);
-            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + DateTime.Now.Ticks);
+            vnpay.AddRequestData("vnp_OrderInfo", "Thanh toan don hang:" + DateTime.UtcNow.Ticks);
             vnpay.AddRequestData("vnp_OrderType", "other");
             vnpay.AddRequestData("vnp_ReturnUrl", vnp_Returnurl);
             vnpay.AddRequestData("vnp_TxnRef", Convert.ToString(_order.OrderId));

@@ -2,17 +2,21 @@
 using backend.DTOs;
 using backend.Models;
 using backend.Services.NewsService;
+using backend.Services.OtherService;
 using backend.Services.PaymentService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Net.payOS;
 using Net.payOS.Types;
+using System.Globalization;
 
 namespace backend.Controllers
 {
     [Route("api/payment")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
@@ -166,7 +170,7 @@ namespace backend.Controllers
                     {
                         paymentSignUp.PaymentAmount = _order.Total;
                     }
-                    paymentSignUp.PaymentDate = DateTime.Now;
+                    paymentSignUp.PaymentDate = DateTime.UtcNow;
                     paymentSignUp.PaymentMethodId = 2;
 
                     var orderDetailList = _context.Orderdetails.Where(x => x.OrderId == _order.OrderId).ToList();
@@ -241,9 +245,21 @@ namespace backend.Controllers
                 Payment paymentSignUp = new Payment();
 
 
-                var checkOrderDetails = _context.Orderdetails.FirstOrDefault(x => x.OrderId == orderId);
-                var checkTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == checkOrderDetails.TicketTypeId);
-                if (checkTicketType.Price > 0)
+                //var checkOrderDetails = _context.Orderdetails.FirstOrDefault(x => x.OrderId == orderId);
+                //var checkTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == checkOrderDetails.TicketTypeId);
+                var orderDetails = _context.Orderdetails.Where(x => x.OrderId == orderId).ToList();
+                bool isFree = true;
+                foreach (var detail in orderDetails)
+                {
+                    var ticketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == detail.TicketTypeId);
+                    if (ticketType != null && ticketType.Price > 0)
+                    {
+                        isFree = false;
+                        break;
+                    }
+                }
+
+                if (!isFree)
                 {
                     PayOS _payOS = new PayOS("02e24a69-a908-4188-8f97-3bc3706857ae", "4fcc829a-c2af-431a-ad3f-b86584287b56", "e4ea17f84e63d87e2ccdbbf8e88e443207cdaaa62be0a1e7bc8bca05b62e368e");
                     PaymentLinkInformation paymentLinkInformation = await _payOS.getPaymentLinkInformation(orderId);
@@ -260,12 +276,74 @@ namespace backend.Controllers
                             _context.Tickets.Add(addNewTicket);
                             _context.SaveChanges();
                         }
-                        var order = _context.Orders.FirstOrDefault(x => x.OrderId == Convert.ToInt32(paymentLinkInformation.orderCode));
+                        var order = _context.Orders.Include(o => o.Account)
+                            .Include(o => o.Orderdetails)
+                                .ThenInclude(od => od.TicketType)
+                                    .ThenInclude(tt => tt.Event)
+                            .Include(o => o.Payments).FirstOrDefault(x => x.OrderId == Convert.ToInt32(paymentLinkInformation.orderCode));
                         if (order != null)
                         {
                             order.Status = "Đã thanh toán";
                             _context.SaveChanges();
+
+                            //update send ticket email for payos payment
+                            var email = order.Account?.Email;
+                            var fullName = order.Account?.FullName;
+                            var payment = order.Payments.SingleOrDefault(x => x.OrderId == paymentLinkInformation.orderCode);
+                            var paymentAmount = paymentLinkInformation?.amount ;
+                            string paymentAmountVND = paymentAmount + " ₫";
+                            var orderDetail = order.Orderdetails.FirstOrDefault();
+                            var eventInfo = orderDetail?.TicketType?.Event;
+
+                            if (email != null && fullName != null && eventInfo != null)
+                            {
+                                var eventName = eventInfo.EventName;
+                                var eventStartTime = eventInfo.StartTime.Value;
+                                var eventLocation = eventInfo.Location;
+                                var eventAddress = eventInfo.Address;
+
+                                foreach (var detail in getOrderDetail)
+                                {
+                                    var ticket = detail.Tickets.FirstOrDefault();
+                                    if (ticket != null)
+                                    {
+                                        var ticketId = ticket.TicketId;
+                                        var ticketType = detail.TicketType?.TypeName ?? "??";
+                                        var quantity = detail.Quantity.Value;
+                                        var fthOrderId = "FTH" + DateTime.Now.Year + order.OrderId;
+
+                                        //await EmailService.Instance.SendTicketEmail(
+                                        //    email,
+                                        //    fullName,
+                                        //    ticketId,
+                                        //    ticketType,
+                                        //    quantity,
+                                        //    fthOrderId,
+                                        //    paymentAmountVND,
+                                        //    eventName,
+                                        //    eventStartTime,
+                                        //    eventLocation,
+                                        //    eventAddress
+                                        //);
+                                        _ = Task.Run(() => EmailService.Instance.SendTicketEmail(
+                                            email,
+                                            fullName,
+                                            ticketId,
+                                            ticketType,
+                                            quantity,
+                                            fthOrderId,
+                                            paymentAmountVND,
+                                            eventName,
+                                            eventStartTime,
+                                            eventLocation,
+                                            eventAddress
+                                        ));
+                                    }
+                                }
+                            }
                         }
+
+
                     }
                     return Ok(new
                     {
@@ -287,11 +365,71 @@ namespace backend.Controllers
                         _context.Tickets.Add(addNewTicket);
                         _context.SaveChanges();
                     }
-                    var order = _context.Orders.FirstOrDefault(x => x.OrderId == orderId);
+                    var order = _context.Orders.Include(o => o.Account)
+                            .Include(o => o.Orderdetails)
+                                .ThenInclude(od => od.TicketType)
+                                    .ThenInclude(tt => tt.Event)
+                            .Include(o => o.Payments).FirstOrDefault(x => x.OrderId == orderId);
                     if (order != null)
                     {
+
                         order.Status = "Đã thanh toán";
                         _context.SaveChanges();
+
+                        //update send ticket email for free ticket
+                        var email = order.Account?.Email;
+                        var fullName = order.Account?.FullName;
+                        //var payment = order.Payments.SingleOrDefault(x => x.OrderId == order.OrderId);
+                        var paymentAmount = "Miễn phí";
+                        var orderDetail = order.Orderdetails.FirstOrDefault();
+                        var eventInfo = orderDetail?.TicketType?.Event;
+
+                        if (email != null && fullName != null && eventInfo != null)
+                        {
+                            var eventName = eventInfo.EventName;
+                            var eventStartTime = eventInfo.StartTime.Value;
+                            var eventLocation = eventInfo.Location;
+                            var eventAddress = eventInfo.Address;
+
+                            foreach (var detail in getOrderDetail)
+                            {
+                                var ticket = detail.Tickets.FirstOrDefault();
+                                if (ticket != null)
+                                {
+                                    var ticketId = ticket.TicketId;
+                                    var ticketType = detail.TicketType?.TypeName ?? "??";
+                                    var quantity = detail.Quantity.Value;
+                                    var fthOrderId = "FTH" + DateTime.Now.Year + order.OrderId;
+
+                                    //await EmailService.Instance.SendTicketEmail(
+                                    //    email,
+                                    //    fullName,
+                                    //    ticketId,
+                                    //    ticketType,
+                                    //    quantity,
+                                    //    fthOrderId,
+                                    //    paymentAmount,
+                                    //    eventName,
+                                    //    eventStartTime,
+                                    //    eventLocation,
+                                    //    eventAddress
+                                    //);
+                                    _ = Task.Run(() => EmailService.Instance.SendTicketEmail(
+                                        email,
+                                        fullName,
+                                        ticketId,
+                                        ticketType,
+                                        quantity,
+                                        fthOrderId,
+                                        paymentAmount,
+                                        eventName,
+                                        eventStartTime,
+                                        eventLocation,
+                                        eventAddress
+                                    ));
+                                }
+                            }
+                        }
                     }
                     return Ok(new
                     {
@@ -307,6 +445,7 @@ namespace backend.Controllers
                 return Ok(new
                 {
                     status = 400,
+                    message = exception.Message,
                 });
             }
 

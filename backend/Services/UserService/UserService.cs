@@ -84,6 +84,11 @@ namespace backend.Services.UserService
         {
             return _userRepository.GetPhoneNumberWithoutThisPhone(phoneNumber);
         }
+        public Task<object> ChangeAccountRole(int accountId, int newRoleId)
+        {
+            return _userRepository.ChangeAccountRole(accountId, newRoleId);
+        }
+
 
     }
 }

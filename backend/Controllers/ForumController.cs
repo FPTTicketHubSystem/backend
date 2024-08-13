@@ -12,19 +12,21 @@ namespace backend.Controllers
     [ApiController]
     public class ForumController : ControllerBase
     {
-        private readonly IForumService _forumService;
-
-        public ForumController(IForumService forumService)
+        private readonly IForumService _postService;
+        private readonly IConfiguration _configuration;
+        public ForumController(IForumService forumService, IConfiguration configuration)
         {
-            _forumService = forumService;
+            _postService = forumService;
+            _configuration = configuration;
         }
-        //GET: api/post
-        [HttpGet("GetAllPost")]
+
+        [HttpGet("getAllPost")]
         public async Task<ActionResult> GetAllPost()
         {
             try
             {
-                var data = await _forumService.GetAllPost();
+                var data = await _postService.GetAllPost();
+
                 return Ok(data);
             }
             catch
@@ -32,14 +34,13 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        // POST: api/post
-        [HttpPost("addPost")]
-        public async Task<ActionResult> AddPost(PostDTO postDTO)
+
+        [HttpGet("getPostDetail")]
+        public async Task<ActionResult> GetPostById(int postId)
         {
             try
             {
-                postDTO.comment = null;
-                var result = _forumService.AddPost(postDTO);
+                var result = _postService.GetPostById(postId);
                 return Ok(result);
             }
             catch
@@ -48,13 +49,18 @@ namespace backend.Controllers
             }
         }
 
-        //// POST: api/post
-        [HttpPost("deletePost")]
-        public async Task<ActionResult> DeletePost(int idPost)
+        [HttpPost("AddPost")]
+        public async Task<ActionResult> AddPost([FromBody] PostDTO addPost)
         {
             try
             {
-                var result = _forumService.DeletePost(idPost);
+                var post = new Post();
+                post.AccountId = addPost.AccountId;
+                post.PostText = addPost.PostText;
+                post.PostFile = addPost.PostFile;
+                post.Status = "Pending";
+                post.CreateDate = DateTime.Now;
+                var result = _postService.AddPost(post);
                 return Ok(result);
             }
             catch
@@ -63,14 +69,12 @@ namespace backend.Controllers
             }
         }
 
-        // POST: api/post
-        [HttpPost("editPost")]
-        public async Task<ActionResult> EditPost(int idPost, PostDTO editpost)
+        [HttpPost("ChangeStatusPost")]
+        public async Task<ActionResult> ChangeStatusPost(int postId, string status)
         {
             try
             {
-                Debug.WriteLine(idPost);
-                var result = _forumService.EditPost(idPost, editpost);
+                var result = _postService.ChangeStatusPost(postId, status);
                 return Ok(result);
             }
             catch
@@ -79,26 +83,30 @@ namespace backend.Controllers
             }
         }
 
-        // POST: api/post
-        [HttpPost("addcommentPost")]
-        public async Task<ActionResult> AddComentPost(int postId, PostCommentDTO postDTO)
+        [HttpPost("EditPost")]
+        public async Task<ActionResult> EditPost(EditPostDTO post)
         {
             try
             {
-                var result = _forumService.AddCommentPost(postId, postDTO);
+                var result = _postService.EditPost(post);
                 return Ok(result);
             }
-            catch
-            {
-                return BadRequest();
-            }
+            catch { return BadRequest(); }
         }
-        [HttpGet("getCommentByPost")]
-        public async Task<ActionResult> getCommentByPost(int postId)
+
+        [HttpGet("GetPostByStatus")]
+        public ActionResult GetPostByStatus(string? status, int accountId)
+        {
+            var result = _postService.GetPostByStatus(status, accountId);
+            return Ok(result);
+        }
+
+        [HttpGet("CountCommentByPost")]
+        public async Task<ActionResult> CountComment(int postId)
         {
             try
             {
-                var result = _forumService.getcomment(postId);
+                var result = _postService.CountComment(postId);
                 return Ok(result);
             }
             catch
@@ -107,25 +115,12 @@ namespace backend.Controllers
             }
         }
 
-        [HttpPost("actionlikepost")]
-        public async Task<ActionResult> actionlikepost(int postId, int userId)
+        [HttpGet("CountLikedNumberByPost")]
+        public async Task<ActionResult> CountLikedNumberByPost(int postId)
         {
             try
             {
-                var result = _forumService.likepost(postId, userId);
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest();
-            }
-        }
-        [HttpPost("deleteComment")]
-        public async Task<ActionResult> deleteComment(int idComment)
-        {
-            try
-            {
-                var result = _forumService.DeleteComment(idComment);
+                var result = _postService.CountLikedNumberByPost(postId);
                 return Ok(result);
             }
             catch
@@ -134,27 +129,103 @@ namespace backend.Controllers
             }
         }
 
-        // POST: api/post
-        [HttpPost("editComment")]
-        public async Task<ActionResult> EditComment(int idComment, String content)
+        [HttpPost("LikePost")]
+        public async Task<ActionResult> LikePost(int postId, int accountId)
         {
             try
             {
-                var result = _forumService.EditComment(idComment, content);
+                var result = _postService.LikePost(postId, accountId);
                 return Ok(result);
             }
             catch
             {
                 return BadRequest();
-
             }
         }
-        [HttpGet("GetAllPostSaved")]
-        public async Task<ActionResult> GetAllPostSaved(int userId)
+
+        [HttpDelete("UnlikePost")]
+        public async Task<IActionResult> UnlikePost(int postId, int accountId)
         {
             try
             {
-                var data = await _forumService.GetAllPostSaved(userId);
+                var result = _postService.UnlikePost(postId, accountId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("DeletePost")]
+        public async Task<IActionResult> DeletePost(int postId)
+        {
+            try
+            {
+                var result = _postService.DeletePost(postId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("RejectPost")]
+        public async Task<IActionResult> RejectPost(int postId)
+        {
+            try
+            {
+                var result = _postService.RejectPost(postId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost("SavePost")]
+        public async Task<ActionResult> SavePost(int postId, int accountId)
+        {
+            try
+            {
+                var result = _postService.SavePost(postId, accountId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpDelete("UnSavePost")]
+        public async Task<IActionResult> UnsavePost(int postId, int accountId)
+        {
+            try
+            {
+                var result = _postService.UnsavePost(postId, accountId);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("GetSavedPostByAccount")]
+        public ActionResult GetSavedPostByAccount(int accountId)
+        {
+            var posts = _postService.GetSavedPostByAccountId(accountId);
+            return Ok(posts);
+        }
+
+        [HttpGet("getAllPostAdmin")]
+        public async Task<ActionResult> GetAllPostAdmin()
+        {
+            try
+            {
+                var data = await _postService.GetAllPostAdmin();
                 return Ok(data);
             }
             catch

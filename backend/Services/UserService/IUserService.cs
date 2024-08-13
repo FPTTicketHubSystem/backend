@@ -20,5 +20,6 @@ namespace backend.Services.UserService
         object ChangeStatusUser(int accountId, string status);
 
         public object GetPhoneNumberWithoutThisPhone(string phoneNumber);
+        Task<object> ChangeAccountRole(int accountId, int newRoleId);
     }
 }
