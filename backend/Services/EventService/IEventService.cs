@@ -16,5 +16,8 @@ namespace backend.Services.EventService
         Task<object> ChangeEventStatus(int eventId, string status);
         Task<object> GetEventByAccount(int accountId);
         object GetEventForEdit(int eventId);
+        object searchEventByContainTiTile(string searchString);
+        object searchEventByFilter(string filter);
+        Task<object> GetAllEventUser();
     }
 }

@@ -292,7 +292,7 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public object GetEventByCategory (int categoryId)
+        public object GetEventByCategory(int categoryId)
         {
             var data = _context.Events
                 .Include(e => e.Tickettypes)
@@ -409,6 +409,157 @@ namespace backend.Repositories.EventRepository
             {
                 return null;
             }
+            return data;
+        }
+
+        public object searchEventByContainTiTile(string searchString)
+        {
+            try
+            {
+                var listEventAfterString = new List<Event>();
+                if (searchString != null || searchString != "")
+                {
+                    listEventAfterString = _context.Events.Include(e => e.Tickettypes).Where(x => x.EventName.Contains(searchString)).ToList();
+                }
+                else
+                {
+                    listEventAfterString = _context.Events.Include(e => e.Tickettypes).ToList();
+                }
+                return new
+                {
+                    status = 200,
+                    listEventAfterString = listEventAfterString,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    status = 400,
+                };
+            }
+        }
+
+        public object searchEventByFilter(string filter)
+        {
+            try
+            {
+                var filterValues = filter.Split(',').Select(f => f.Trim()).ToList();
+                var listWhenFilter = new List<Event>();
+
+                foreach (var filterValue in filterValues)
+                {
+                    var checkEvent = _context.Events.Where(e => e.Status == "Đã duyệt").ToList();
+
+                    foreach (var events in checkEvent)
+                    {
+                        if (filterValue.Equals("Miễn phí"))
+                        {
+                            var checkTypeOfTicketTypeFree = _context.Tickettypes
+                                .Where(x => x.Price == 0 && x.EventId == events.EventId) 
+                                .FirstOrDefault();
+                            if (checkTypeOfTicketTypeFree != null)
+                            {
+                                listWhenFilter.Add(events);
+                            }
+                        }
+                        if (filterValue.Equals("Có phí"))
+                        {
+                            var checkTypeOfTicketTypePaid = _context.Tickettypes
+                                .Where(x => x.Price > 0 && x.EventId == events.EventId)
+                                .FirstOrDefault();
+                            if (checkTypeOfTicketTypePaid != null)
+                            {
+                                listWhenFilter.Add(events);
+                            }
+                        }
+                        if (filterValue.Equals("Nghệ thuật"))
+                        {
+                            var checkEventByCategory1 = _context.Events.Include(e => e.Tickettypes)
+                                .Where(x => x.CategoryId == 1 && x.EventId == events.EventId && x.Status == "Đã duyệt") 
+                                .ToList();
+                            foreach (var eventByCategory1 in checkEventByCategory1)
+                            {
+                                listWhenFilter.Add(eventByCategory1);
+                            }
+                        }
+                        if (filterValue.Equals("Giáo dục"))
+                        {
+                            var checkEventByCategory2 = _context.Events.Include(e => e.Tickettypes)
+                                .Where(x => x.CategoryId == 2 && x.EventId == events.EventId && x.Status == "Đã duyệt")
+                                .ToList();
+                            foreach (var eventByCategory2 in checkEventByCategory2)
+                            {
+                                listWhenFilter.Add(eventByCategory2);
+                            }
+                        }
+                        if (filterValue.Equals("Workshop"))
+                        {
+                            var checkEventByCategory3 = _context.Events.Include(e => e.Tickettypes)
+                                .Where(x => x.CategoryId == 3 && x.EventId == events.EventId && x.Status == "Đã duyệt")
+                                .ToList();
+                            foreach (var eventByCategory3 in checkEventByCategory3)
+                            {
+                                listWhenFilter.Add(eventByCategory3);
+                            }
+                        }
+                        if (filterValue.Equals("Khác"))
+                        {
+                            var checkEventByCategory4 = _context.Events.Include(e => e.Tickettypes)
+                                .Where(x => x.CategoryId == 4 && x.EventId == events.EventId && x.Status == "Đã duyệt")
+                                .ToList();
+                            foreach (var eventByCategory4 in checkEventByCategory4)
+                            {
+                                listWhenFilter.Add(eventByCategory4);
+                            }
+                        }
+                    }
+                }
+
+                var resultFilter = listWhenFilter.GroupBy(e => e.EventId)
+                    .Select(g => g.First())
+                    .ToList();
+
+                return new
+                {
+                    status = 200,
+                    resultFilter = resultFilter,
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    status = 400,
+                };
+            }
+        }
+        public async Task<object> GetAllEventUser()
+        {
+            var data = _context.Events.Where(e => e.Status == "Đã duyệt")
+                .Include(e => e.Category)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Account)
+                .OrderByDescending(e => e.StartTime)
+                .Select(e =>
+                new
+                {
+                    e.Account.AccountId,
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Status
+                });
             return data;
         }
 

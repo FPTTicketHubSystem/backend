@@ -28,11 +28,11 @@ namespace backend.Controllers
             }
         }
         [HttpGet("getTicketById")]
-        public async Task<ActionResult> GetTicketById(int ticketId)
+        public async Task<ActionResult> GetTicketById(int ticketId, int userId)
         {
             try
             {
-                var data = _ticketService.GetTicketById(ticketId);
+                var data = _ticketService.GetTicketById(ticketId, userId);
                 return Ok(data);
             }
             catch { return BadRequest(); }

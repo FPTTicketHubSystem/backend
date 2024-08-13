@@ -3,6 +3,6 @@
     public interface ITicketService
     {
         Task<object> GetTicketByAccount(int accountId);
-        object GetTicketById(int ticketId);
+        object GetTicketById(int ticketId, int userId);
     }
 }

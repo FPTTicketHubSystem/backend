@@ -16,5 +16,8 @@ namespace backend.Repositories.EventRepository
         Task<object> ChangeEventStatus(int eventId, string status);
         object GetEventForEdit(int eventId);
         Task<object> GetEventByAccount(int accountId);
+        object searchEventByContainTiTile(string searchString);
+        object searchEventByFilter(string filter);
+        Task<object> GetAllEventUser();
     }
 }
