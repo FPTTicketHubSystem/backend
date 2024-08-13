@@ -29,5 +29,8 @@ namespace backend.Services.EventService
         Task<List<TicketSalesPerTicketType>> GetTicketSalesPerTicketType(int eventId);
         Task<object> GetEventStatus(int eventId);
         Task<object> GetAverageRating(int eventId);
+        object searchEventByContainTiTile(string searchString);
+        object searchEventByFilter(string filter);
+        Task<object> GetAllEventUser();
     }
 }

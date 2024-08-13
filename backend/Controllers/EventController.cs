@@ -258,5 +258,42 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
+        
+        [HttpGet("searchEventByContainTiTile")]
+        public async Task<ActionResult> SearchEventByContainTiTile(string searchString)
+        {
+            try
+            {
+                var data = _eventService.searchEventByContainTiTile(searchString);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpGet("searchEventByFilter")]
+        public async Task<ActionResult> SearchEventByFilter(string filter)
+        {
+            try
+            {
+                var data = _eventService.searchEventByFilter(filter);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        //GET: api/event
+        [HttpGet("getAllEventUser")]
+        public async Task<ActionResult> GetAllEventUser()
+        {
+            try
+            {
+                var data = await _eventService.GetAllEventUser();
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

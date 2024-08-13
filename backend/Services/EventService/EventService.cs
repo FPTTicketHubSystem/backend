@@ -128,5 +128,19 @@ namespace backend.Services.EventService
         {
             return await _eventRepository.GetAverageRating(eventId);
         }
+        
+        public object searchEventByContainTiTile(string searchString)
+        {
+            return _eventRepository.searchEventByContainTiTile(searchString);
+        }
+
+        public object searchEventByFilter(string filter)
+        {
+            return _eventRepository.searchEventByFilter(filter);    
+        }
+        public async Task<object> GetAllEventUser()
+        {
+            return _eventRepository.GetAllEventUser();
+        }
     }
 }

@@ -38,11 +38,11 @@ namespace backend.Repositories.TicketRepository
             return data;
         }
 
-        public object GetTicketById(int ticketId)
+        public object GetTicketById(int ticketId, int userId)
         {
             var data = _context.Tickets
-            .Include(t => t.OrderDetail)
-                            .Where(t => t.TicketId == ticketId && t.OrderDetail.Order.Status == "Đã thanh toán")
+            .Include(t => t.OrderDetail).ThenInclude(od => od.Order)
+                            .Where(t => t.TicketId == ticketId && t.OrderDetail.Order.Status == "Đã thanh toán" && t.OrderDetail.Order.AccountId == userId)
                             .Select(t =>
                             new
                             {
@@ -61,7 +61,7 @@ namespace backend.Repositories.TicketRepository
                                 t.OrderDetail.Order.Account.Phone,
                                 t.OrderDetail.Quantity,
                                 t.IsCheckedIn,
-                                t.CheckInDate,
+                                t.CheckInDate                              
 
                             }).FirstOrDefault();
             if (data == null)

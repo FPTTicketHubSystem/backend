@@ -15,9 +15,9 @@ namespace backend.Services.TicketService
         {
             return await _ticketRepository.GetTicketByAccount(accountId);
         }
-        public object GetTicketById(int ticketId)
+        public object GetTicketById(int ticketId, int userId)
         {
-            var result = _ticketRepository.GetTicketById(ticketId);
+            var result = _ticketRepository.GetTicketById(ticketId, userId);
             return result;
         }
 
