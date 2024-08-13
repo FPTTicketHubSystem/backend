@@ -258,7 +258,8 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
-        
+
+        [AllowAnonymous]
         [HttpGet("searchEventByContainTiTile")]
         public async Task<ActionResult> SearchEventByContainTiTile(string searchString)
         {
@@ -270,6 +271,7 @@ namespace backend.Controllers
             catch { return BadRequest(); }
         }
 
+        [AllowAnonymous]
         [HttpGet("searchEventByFilter")]
         public async Task<ActionResult> SearchEventByFilter(string filter)
         {
@@ -281,7 +283,9 @@ namespace backend.Controllers
             catch { return BadRequest(); }
         }
 
+
         //GET: api/event
+        [AllowAnonymous]
         [HttpGet("getAllEventUser")]
         public async Task<ActionResult> GetAllEventUser()
         {

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = "User")]
+
 public class EventRatingController : ControllerBase
 {
     private readonly IEventRatingService _eventRatingService;

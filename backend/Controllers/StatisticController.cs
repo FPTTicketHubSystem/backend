@@ -1,5 +1,6 @@
 ﻿using backend.DTOs;
 using backend.Services.StatisticService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace backend.Controllers
 {
     [Route("api/statistics")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class StatisticController : ControllerBase
     {
         private readonly IStatisticService _statisticService;

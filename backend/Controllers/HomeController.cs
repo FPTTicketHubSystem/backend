@@ -134,7 +134,7 @@ namespace backend.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpGet("search")]
         public async Task<ActionResult> SearchInforByEmail(string email)
         {

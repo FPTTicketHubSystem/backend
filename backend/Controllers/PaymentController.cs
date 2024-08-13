@@ -291,7 +291,7 @@ namespace backend.Controllers
                             var fullName = order.Account?.FullName;
                             var payment = order.Payments.SingleOrDefault(x => x.OrderId == paymentLinkInformation.orderCode);
                             var paymentAmount = paymentLinkInformation?.amount ;
-                            string paymentAmountVND = paymentAmount + " ₫";
+                            string paymentAmountVND = paymentAmount?.ToString("#,##0") + " ₫";
                             var orderDetail = order.Orderdetails.FirstOrDefault();
                             var eventInfo = orderDetail?.TicketType?.Event;
 
