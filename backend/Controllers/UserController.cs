@@ -40,7 +40,7 @@ namespace backend.Controllers
             }
         }
 
-        [Authorize(Roles = "Organizer,User,Amin,OrganizerStaff")]
+        [Authorize(Roles = "Organizer,User,Admin,OrganizerStaff")]
         [HttpPost("changePassword")]
         public async Task<ActionResult> ChangePassword(int accountId, string newPassword)
         {
