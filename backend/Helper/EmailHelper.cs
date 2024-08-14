@@ -132,7 +132,7 @@ namespace backend.Helper
                                                 <p style=""margin: 0;"">Dear {fullname}, <br />
                                                     Chúng tôi nhận được yêu cầu đăng ký của bạn với email {email}<br /><br />
                                                     Bấm nút xác thực bên dưới để xác nhận tài khoản.<br />
-                                                    <a href=""http://localhost:3000/confirmaccount/{emailEncypt}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
+                                                    <a href=""https://frontend-nine-brown-60.vercel.app/confirmaccount/{emailEncypt}"" target=""_blank"" class=""button"">Xác thực</a><br /><br />
                                                     Chúc bạn có trải nghiệm tốt.
                                                 </p>
                                             </td>
@@ -482,7 +482,7 @@ namespace backend.Helper
         }
         public string RatingRequestMail(string fullname, string eventName, int eventRatingId)
         {
-            string rateEventUrl = $"http://localhost:3000/rate/{eventRatingId}";
+            string rateEventUrl = $"https://frontend-nine-brown-60.vercel.app/rate/{eventRatingId}";
 
             return $@"
                 <!DOCTYPE html>
