@@ -14,6 +14,8 @@ namespace backend.Repositories.NewsRepository
         /*object GetAllNewsInUserPage();*/
         object GetNewDetail(int newsId);
         object GetNewsByPage(int page, int pageSize);
+        object GetNewsForEdit(int newsId);
+        object EditNew(NewsDTO updateNews);
     }
 }
 

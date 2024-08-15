@@ -172,6 +172,31 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("getNewsForEdit")]
+        public async Task<ActionResult> GetNewsForEdit(int newsId)
+        {
+            try
+            {
+                var data = _newService.GetNewsForEdit(newsId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPut("editNews")]
+        public async Task<ActionResult> EditNews(NewsDTO updateNews)
+        {
+            try
+            {
+                var result = _newService.EditNew(updateNews);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }
 
