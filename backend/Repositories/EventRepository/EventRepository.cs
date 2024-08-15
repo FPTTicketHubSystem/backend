@@ -23,7 +23,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e =>
                 new
                 {
@@ -53,7 +53,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
                 .Where(e => e.Status != "Nháp")
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e =>
                 new
                 {
@@ -300,7 +300,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Category)
                 .Where(e => e.CategoryId == categoryId && e.Status == "Đã duyệt")
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .ToList();
             if (data == null)
             {
@@ -316,7 +316,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
                 .Where(e => e.Status == "Đã duyệt" && e.StartTime > DateTime.UtcNow)
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Take(5)
                 .Select(e =>
                 new
@@ -396,7 +396,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
                 .Where(e => e.AccountId == accountId)
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e =>
                 new
                 {
@@ -784,7 +784,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Category)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Account)
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e =>
                 new
                 {

@@ -168,7 +168,7 @@ namespace backend.Repositories.StaffRepository
             var data = _context.Events
                 .Include(e => e.Eventstaffs)
                 .Where(e => e.Eventstaffs.Any(es => es.AccountId == staffId))
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e => new
                 {
                     e.EventId,
