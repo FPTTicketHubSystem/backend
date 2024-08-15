@@ -77,6 +77,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
+
         [HttpPost("DeleteComment")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {

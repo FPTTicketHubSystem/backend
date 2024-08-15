@@ -182,7 +182,7 @@ namespace backend.Repositories.ForumRepository
         public object RejectPost(int postId)
         {
             var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
-            if (post == null || post.Status != "Pending")
+            if (post == null || post.Status != "Chờ duyệt")
             {
                 return new
                 {
@@ -192,7 +192,7 @@ namespace backend.Repositories.ForumRepository
             }
             else
             {
-                post.Status = "Rejected";
+                post.Status = "Từ chối";
                 _context.SaveChanges();
                 return new
                 {
@@ -218,7 +218,7 @@ namespace backend.Repositories.ForumRepository
                 {
                     AccountId = accountId,
                     PostId = postId,
-                    Status = "Saved"
+                    Status = "Đã lưu"
                 };
                 var checkExist = _context.Postfavorites.Any(c => c.PostId == postId && c.AccountId == accountId);
                 {
@@ -272,7 +272,7 @@ namespace backend.Repositories.ForumRepository
             {
                 var posts = _context.Postfavorites
                     .Include(p => p.Post)
-                    .Where(p => p.AccountId == accountId && p.Status == "Saved" && p.Post.Status == "Approved")
+                    .Where(p => p.AccountId == accountId && p.Status == "Đã lưu" && p.Post.Status == "Đã duyệt")
                     .OrderByDescending(p => p.Post.CreateDate)
                     .Select(p =>
                 new
