@@ -75,7 +75,7 @@ namespace backend.Repositories.ForumRepository
         public dynamic GetPostByStatus(string? status, int accountId)
         {
             var checkAccount = _context.Accounts.SingleOrDefault(a => a.AccountId == accountId);
-            if (checkAccount.RoleId == 1 || checkAccount.RoleId == 2)
+            if (checkAccount.RoleId == 1)
             {
                 var posts = _context.Posts
                 .Include(p => p.Postcomments)
@@ -170,7 +170,7 @@ namespace backend.Repositories.ForumRepository
             }
             else
             {
-                post.Status = "Deleted";
+                post.Status = "Đã xóa";
                 _context.SaveChanges();
                 return new
                 {
@@ -442,6 +442,31 @@ namespace backend.Repositories.ForumRepository
                     status = 400,
                 };
             }
+        }
+        public async Task<object> GetAllPostAdmin()
+        {
+            var data = await _context.Posts
+                .Include(p => p.Account)
+                .Include(p => p.Postcomments)
+                .OrderByDescending(p => p.CreateDate)
+                .Select(p => new
+                {
+                    p.PostId,
+                    p.AccountId,
+                    p.Account.Avatar,
+                    p.Account.FullName,
+                    p.PostText,
+                    p.PostFile,
+                    p.Status,
+                    p.CreateDate,
+                    p.Postlikes,
+                    p.Postfavorites,
+                    countComment = p.Postcomments.Count(),
+                    countLike = p.Postlikes.Count(),
+                })
+                .ToListAsync();
+
+            return data;
         }
     }
 }

@@ -31,12 +31,12 @@ namespace backend.DTOs
     public class PostCommentDTO
     {
         public int PostCommentId { get; set; }
-        public int AccountId { get; set; }
-        public int PostId { get; set; }
-        public string Content { get; set; }
-        public string FileComment { get; set; }
-        public DateTime CommentDate { get; set; }
-        public string Status { get; set; }
+        public int? AccountId { get; set; }
+        public int? PostId { get; set; }
+        public string? Content { get; set; }
+        public string? FileComment { get; set; }
+        public string? Status { get; set; }
+        public DateTime? CommentDate { get; set; }
     }
     public class PostFavoriteDTO
     {

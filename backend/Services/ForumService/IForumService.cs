@@ -20,5 +20,6 @@ namespace backend.Services.ForumService
         object UnlikePost(int postId, int accountId);
         object CountLikedNumberByPost(int postId);
         object CountComment(int postId);
+        Task<object> GetAllPostAdmin();
     }
 }
