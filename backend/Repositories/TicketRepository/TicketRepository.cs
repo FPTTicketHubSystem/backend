@@ -18,7 +18,7 @@ namespace backend.Repositories.TicketRepository
             var data = _context.Tickets
                 .Include(t => t.OrderDetail)
                 .Where(t => t.OrderDetail.Order.AccountId == accountId && t.OrderDetail.Order.Status == "Đã thanh toán")
-                .OrderByDescending(t => t.OrderDetail.Order.OrderDate)
+                .OrderBy(t => t.OrderDetail.TicketType.Event.StartTime)
                 .Select(t =>
                 new
                 {
@@ -61,7 +61,9 @@ namespace backend.Repositories.TicketRepository
                                 t.OrderDetail.Order.Account.Phone,
                                 t.OrderDetail.Quantity,
                                 t.IsCheckedIn,
-                                t.CheckInDate                              
+                                t.CheckInDate,
+                                orderId = "FTH2024" + t.OrderDetail.Order.OrderId,
+                                paymentAmount = t.OrderDetail.Order.Payments.FirstOrDefault().PaymentAmount ?? 0
 
                             }).FirstOrDefault();
             if (data == null)
@@ -74,5 +76,7 @@ namespace backend.Repositories.TicketRepository
             }
             return data;
         }
+
+
     }
 }

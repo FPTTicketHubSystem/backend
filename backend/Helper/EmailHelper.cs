@@ -12,6 +12,16 @@ namespace backend.Helper
             private set { EmailHelper.instance = value; }
         }
 
+        public DateTime ConvertUtcToVietnamTime(DateTime utcTime)
+        {
+            TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+            DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(utcTime, vietnamTimeZone);
+
+            return vietnamTime;
+        }
+
+
         public string RegisterMail(string fullname, string? emailEncypt, string email)
         {
             return $@"
@@ -324,6 +334,7 @@ namespace backend.Helper
         {
             string eventLocationEncoded = HttpUtility.UrlEncode(eventLocation);
             string eventAddressEncoded = HttpUtility.UrlEncode(eventAddress);
+            DateTime eventStartTimeLocal = ConvertUtcToVietnamTime(eventStartTime);
             return $@"
                 <!DOCTYPE html>
                 <html>
@@ -460,7 +471,7 @@ namespace backend.Helper
                                             <p style='margin: 0;'>Dear {fullname},<br /><br />
                                                 Sự kiện <strong>{eventName}</strong> mà bạn đã nhận vé tham gia sẽ diễn ra vào ngày mai.
                                                 <br/><br/>
-                                                <strong>Thời gian bắt đầu:</strong> {eventStartTime:dd/MM/yyyy HH:mm}<br/>
+                                                <strong>Thời gian bắt đầu:</strong> {eventStartTimeLocal:dd/MM/yyyy HH:mm}<br/>
                                                 <strong>Tên địa điểm:</strong> {eventLocation}<br/>
                                                 <strong>Địa chỉ:</strong> {eventAddress}<br/>
                                                 <a href=""https://www.google.com/maps/search/{eventLocationEncoded},%20{eventAddressEncoded}"" target=""_blank"">Xem trên Google Maps</a><br/><br/>
@@ -640,6 +651,7 @@ namespace backend.Helper
         {
             string eventLocationEncoded = HttpUtility.UrlEncode(eventLocation);
             string eventAddressEncoded = HttpUtility.UrlEncode(eventAddress);
+            DateTime eventStartTimeLocal = ConvertUtcToVietnamTime(eventStartTime);
             return $@"
                     <!DOCTYPE html>
                     <html>
@@ -801,7 +813,7 @@ namespace backend.Helper
                                                 <strong>Mã order: </strong> {orderId}<br/>
                                                 <strong>Tổng thanh toán: </strong> {paymentAmount}<br/><br/>
                                                 <strong>Tên sự kiện: </strong>{eventName}<br/>
-                                                    <strong>Thời gian bắt đầu:</strong> {eventStartTime:dd/MM/yyyy HH:mm}<br/>
+                                                    <strong>Thời gian bắt đầu:</strong> {eventStartTimeLocal:dd/MM/yyyy HH:mm}<br/>
                                                     <strong>Tên địa điểm:</strong> {eventLocation}<br/>
                                                     <strong>Địa chỉ: </strong>{eventAddress}<br/>
                                                     <a href=""https://www.google.com/maps/search/{eventLocationEncoded},%20{eventAddressEncoded}"" target=""_blank"">Xem trên Google Maps</a><br/><br/>

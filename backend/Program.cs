@@ -32,6 +32,7 @@ using backend.Services.PostCommentService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +87,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
 builder.Services.AddSingleton<EmailService>();
+builder.Services.AddSingleton(new PayOS("b2514e3c-d2d6-432a-b1a4-eaaa8b989c88", "f8879890-fd24-41db-bc96-aa21ec3f7abd", "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637"));
 builder.Services.AddHostedService<EmailReminderService>();
 builder.Services.AddHostedService<EmailRatingService>();
 builder.Services.AddHostedService<StaffRemoveService>();

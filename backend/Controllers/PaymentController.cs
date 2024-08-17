@@ -1,5 +1,6 @@
 ﻿using Azure;
 using backend.DTOs;
+    using backend.Helper;
 using backend.Models;
 using backend.Services.NewsService;
 using backend.Services.OtherService;
@@ -8,24 +9,31 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Net.payOS;
 using Net.payOS.Types;
+using Net.payOS.Utils;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json.Nodes;
 
 namespace backend.Controllers
 {
     [Route("api/payment")]
     [ApiController]
-    [Authorize(Roles = "User")]
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
         private readonly PayOS _payOS;
         private readonly FpttickethubContext _context;
-        public PaymentController(IPaymentService paymentService,FpttickethubContext context)
+        public PaymentController(IPaymentService paymentService, FpttickethubContext context, PayOS payOS)
         {
             _paymentService = paymentService;
             _context = context;
+            _payOS = payOS;
         }
 
         [HttpPost("paymentForUser")]
@@ -140,6 +148,7 @@ namespace backend.Controllers
             }
         }
 
+
         [HttpPost("createPaymentWithPayos")]
         public async Task<ActionResult> CreatePaymentWithPayos(ReturnPaymentURL returnPaymentURL)
         {
@@ -157,7 +166,7 @@ namespace backend.Controllers
                 if (checkTicketType.Price > 0)
                 {
 
-                    PayOS _payOS = new PayOS("02e24a69-a908-4188-8f97-3bc3706857ae", "4fcc829a-c2af-431a-ad3f-b86584287b56", "e4ea17f84e63d87e2ccdbbf8e88e443207cdaaa62be0a1e7bc8bca05b62e368e");
+                    //PayOS _payOS = new PayOS("b2514e3c-d2d6-432a-b1a4-eaaa8b989c88", "f8879890-fd24-41db-bc96-aa21ec3f7abd", "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637");
                     Discountcode discountCode = _context.Discountcodes.SingleOrDefault(x => x.Code == _discountCode);
                     paymentSignUp.OrderId = _order.OrderId;
                     paymentSignUp.Status = "0";
@@ -172,6 +181,8 @@ namespace backend.Controllers
                     }
                     paymentSignUp.PaymentDate = DateTime.UtcNow;
                     paymentSignUp.PaymentMethodId = 2;
+                    _context.Payments.Add(paymentSignUp);
+                    _context.SaveChanges();
 
                     var orderDetailList = _context.Orderdetails.Where(x => x.OrderId == _order.OrderId).ToList();
                     List<ItemData> items = new List<ItemData>();
@@ -194,13 +205,18 @@ namespace backend.Controllers
                         //PaymentData paymentData = new PaymentData(_order.OrderId, (int)_order.Total, _order.Status, items, body.cancelUrl, body.returnUrl);
                         var returnUrl = "https://frontend-nine-brown-60.vercel.app/payment-success/" + _order.OrderId;
                         var statusPayment = "Don hang " + _order.OrderId;
+                        var cancelUrl = "https://frontend-nine-brown-60.vercel.app/payment-success/" + _order.OrderId;
+                        var merchantId = "b2514e3c-d2d6-432a-b1a4-eaaa8b989c88";
+                        var transactionId = "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637";
                         PaymentData paymentData = new PaymentData(_order.OrderId, (int)_order.Total, statusPayment, items, returnUrl, returnUrl);
-                        CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
+                        string signature = SignatureControl.CreateSignatureOfPaymentRequest(paymentData, "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637");
+                        PaymentData paymentData2 = new PaymentData(_order.OrderId, (int)_order.Total, statusPayment, items, returnUrl, returnUrl, signature);
+                        CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData2);
                         return Ok(new
                         {
                             status = 200,
                             message = "Thanh toan thanh cong",
-                            createPayment = createPayment, 
+                            createPayment = createPayment,
                             paymentMethod = 0 // thanh toan bang tien
                         });
                     }
@@ -212,7 +228,8 @@ namespace backend.Controllers
                             message = "Thanh toan that bai"
                         });
                     }
-                } else
+                }
+                else
                 {
                     return Ok(new
                     {
@@ -222,8 +239,8 @@ namespace backend.Controllers
                     });
 
                 }
-                
-                
+
+
             }
             catch (System.Exception exception)
             {
@@ -261,7 +278,6 @@ namespace backend.Controllers
 
                 if (!isFree)
                 {
-                    PayOS _payOS = new PayOS("02e24a69-a908-4188-8f97-3bc3706857ae", "4fcc829a-c2af-431a-ad3f-b86584287b56", "e4ea17f84e63d87e2ccdbbf8e88e443207cdaaa62be0a1e7bc8bca05b62e368e");
                     PaymentLinkInformation paymentLinkInformation = await _payOS.getPaymentLinkInformation(orderId);
                     if (paymentLinkInformation.status == "PAID")
                     {
@@ -284,13 +300,18 @@ namespace backend.Controllers
                         if (order != null)
                         {
                             order.Status = "Đã thanh toán";
+                            paymentSignUp = _context.Payments.SingleOrDefault(x => x.OrderId == orderId);
+                            if (paymentSignUp != null)
+                            {
+                                paymentSignUp.Status = "1";
+                            }
                             _context.SaveChanges();
 
                             //update send ticket email for payos payment
                             var email = order.Account?.Email;
                             var fullName = order.Account?.FullName;
                             var payment = order.Payments.SingleOrDefault(x => x.OrderId == paymentLinkInformation.orderCode);
-                            var paymentAmount = paymentLinkInformation?.amount ;
+                            var paymentAmount = paymentLinkInformation?.amount;
                             string paymentAmountVND = paymentAmount?.ToString("#,##0") + " ₫";
                             var orderDetail = order.Orderdetails.FirstOrDefault();
                             var eventInfo = orderDetail?.TicketType?.Event;
@@ -349,7 +370,7 @@ namespace backend.Controllers
                     {
                         status = 200,
                         paymentLinkInformation = paymentLinkInformation,
-                        paymentMethod = 0 
+                        paymentMethod = 0
                     });
                 }
                 else
@@ -431,14 +452,20 @@ namespace backend.Controllers
                             }
                         }
                     }
+                    paymentSignUp = _context.Payments.SingleOrDefault(x => x.OrderId == orderId);
+                    if (paymentSignUp != null)
+                    {
+                        paymentSignUp.Status = "1";
+                        _context.SaveChanges();
+                    }
                     return Ok(new
                     {
                         status = 200,
                         paymentMethod = 1
                     });
-                } 
-                    
-                   
+                }
+
+
             }
             catch (System.Exception exception)
             {

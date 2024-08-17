@@ -148,7 +148,6 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
         //[HttpGet("weeklyActivity")]
         //public async Task<ActionResult> WeeklyActivity(int accountId)
         //{

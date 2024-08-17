@@ -80,6 +80,23 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
+                if (!newEventDto.TicketTypes.Any())
+                {
+                    return new
+                    {
+                        message = "Tickettype is required",
+                        status = 400
+                    };
+                }
+
+                if (string.IsNullOrEmpty(newEventDto.EventDescription))
+                {
+                    return new
+                    {
+                        message = "Description is required",
+                        status = 400
+                    };
+                }
                 var newEvent = new Event
                 {
                     AccountId = newEventDto.AccountId,
@@ -338,6 +355,36 @@ namespace backend.Repositories.EventRepository
                     e.Status
                 })
                 .ToListAsync();
+            if (!data.Any() && data.Count < 3)
+            {
+                data = await _context.Events
+                .Include(e => e.Category)
+                .Include(e => e.Tickettypes)
+                .Include(e => e.Account)
+                .Where(e => e.Status == "Đã duyệt")
+                .OrderBy(e => e.StartTime)
+                .Take(5)
+                .Select(e =>
+                new
+                {
+                    e.Account.AccountId,
+                    e.EventId,
+                    e.CategoryId,
+                    e.Category.CategoryName,
+                    e.Tickettypes,
+                    e.Account.FullName,
+                    e.Account.Avatar,
+                    e.EventName,
+                    e.ThemeImage,
+                    e.EventDescription,
+                    e.Address,
+                    e.Location,
+                    e.StartTime,
+                    e.EndTime,
+                    e.Status
+                })
+                .ToListAsync();
+            }
 
             return data;
         }

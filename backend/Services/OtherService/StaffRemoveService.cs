@@ -57,6 +57,7 @@ namespace backend.Services.OtherService
                         foreach (var staff in staffs)
                         {
                             _context.Eventstaffs.Remove(staff);
+                            _context.SaveChanges();
 
                             var user = _context.Accounts.Find(staff.AccountId);
                             if (user != null && user.RoleId == 4)
