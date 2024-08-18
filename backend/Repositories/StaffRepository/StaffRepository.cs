@@ -45,7 +45,7 @@ namespace backend.Repositories.StaffRepository
                 };
             }
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             if (data.eventStartTime.HasValue && (now < data.eventStartTime.Value.AddHours(-2)))
             {
                 return new
@@ -74,7 +74,7 @@ namespace backend.Repositories.StaffRepository
                 };
             }
 
-            var checkInResult = ChangeCheckInStatus(ticketId, true, DateTime.Now);
+            var checkInResult = ChangeCheckInStatus(ticketId, true, DateTime.UtcNow);
 
 
             if (checkInResult == null)
@@ -168,7 +168,7 @@ namespace backend.Repositories.StaffRepository
             var data = _context.Events
                 .Include(e => e.Eventstaffs)
                 .Where(e => e.Eventstaffs.Any(es => es.AccountId == staffId))
-                .OrderByDescending(e => e.StartTime)
+                .OrderBy(e => e.StartTime)
                 .Select(e => new
                 {
                     e.EventId,

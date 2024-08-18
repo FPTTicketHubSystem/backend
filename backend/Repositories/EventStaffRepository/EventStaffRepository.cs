@@ -93,6 +93,7 @@ namespace backend.Repositories.EventStaffRepository
                 };
             }
             _context.Eventstaffs.Remove(staff);
+            _context.SaveChanges();
 
             var remainingStaffRoles = _context.Eventstaffs
                 .Where(es => es.AccountId == staffId)
@@ -121,8 +122,8 @@ namespace backend.Repositories.EventStaffRepository
         {
             var data = _context.Events
                 .Include(e => e.Eventstaffs)
-                .Where(e => e.AccountId == organizerId && e.Status == "Đã duyệt" && e.EndTime < DateTime.Now)
-                .OrderByDescending(e => e.StartTime)
+                .Where(e => e.AccountId == organizerId && e.Status == "Đã duyệt" && e.EndTime > DateTime.UtcNow)
+                .OrderBy(e => e.StartTime)
                 .Select(e =>
                 new
                 {

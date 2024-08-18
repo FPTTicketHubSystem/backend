@@ -4,6 +4,7 @@ using backend.Models;
 using backend.Repositories.EventRepository;
 using MimeKit.Encodings;
 using Org.BouncyCastle.Asn1.X509;
+using static backend.Repositories.EventRepository.EventRepository;
 
 namespace backend.Services.EventService
 {
@@ -71,5 +72,75 @@ namespace backend.Services.EventService
             return result;
         }
 
+        //update for oganizer manage
+        public async Task<object> GetTicketTypeByEvent(int eventId)
+        {
+            var result = _eventRepository.GetTicketTypeByEvent(eventId);
+            return result;
+        }
+        public async Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity)
+        {
+            var result = _eventRepository.UpdateTicketQuantity(ticketTypeId, addQuantity);
+            return result;
+        }
+        public async Task<object> GetDiscountCodeByEvent(int eventId)
+        {
+            var result = _eventRepository.GetDiscountCodeByEvent(eventId);
+            return result;
+        }
+        public object AddDiscountCode(DiscountCodeDTO discountcode)
+        {
+            var result = _eventRepository.AddDiscountCode(discountcode);
+            return result;
+        }
+        public async Task<object> UpdateDiscountQuantity(int discountId, int addQuantity)
+        {
+            var result = _eventRepository.UpdateDiscountQuantity(discountId, addQuantity);
+            return result;
+        }
+
+        public int GetNumberOfTicketSold(int eventId)
+        {
+            return _eventRepository.GetNumberOfTicketSold(eventId);
+        }
+
+        public decimal GetTotalRevenue(int eventId)
+        {
+            return _eventRepository.GetTotalRevenue(eventId);
+        }
+
+        public int GetActualParticipants(int eventId)
+        {
+            return _eventRepository.GetActualParticipants(eventId);
+        }
+
+        public async Task<List<TicketSalesPerTicketType>> GetTicketSalesPerTicketType(int eventId)
+        {
+            return await _eventRepository.GetTicketSalesPerTicketType(eventId);
+        }
+
+        public async Task<object> GetEventStatus(int eventId)
+        {
+            return await _eventRepository.GetEventStatus(eventId);
+        }
+
+        public async Task<object> GetAverageRating(int eventId)
+        {
+            return await _eventRepository.GetAverageRating(eventId);
+        }
+        
+        public object searchEventByContainTiTile(string searchString)
+        {
+            return _eventRepository.searchEventByContainTiTile(searchString);
+        }
+
+        public object searchEventByFilter(string filter)
+        {
+            return _eventRepository.searchEventByFilter(filter);    
+        }
+        public async Task<object> GetAllEventUser()
+        {
+            return _eventRepository.GetAllEventUser();
+        }
     }
 }

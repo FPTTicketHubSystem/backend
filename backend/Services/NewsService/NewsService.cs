@@ -57,6 +57,19 @@ namespace backend.Services.NewsService
         {
             return _newsRepository.ChangeStatusNews(newsId, status);
         }
+
+        public object GetNewsForEdit(int newsId)
+        {
+            return _newsRepository.GetNewsForEdit(newsId);
+        }
+        public object EditNew(NewsDTO updateNews)
+        {
+            return _newsRepository.EditNew(updateNews);
+        }
+        public async Task<object> GetLastestNews()
+        {
+            return await _newsRepository.GetLastestNews();
+        }
     }
 }
 

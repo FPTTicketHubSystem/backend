@@ -119,20 +119,6 @@ namespace backend.Controllers
             catch { return BadRequest(); }
         }*/
 
-        /*        //GET: api/news
-                [HttpGet("getLastestNews")]
-                public async Task<ActionResult> GetLastestNews()
-                {
-                    try
-                    {
-                        var data = await _newService.GetLastestNews();
-                        return Ok(data);
-                    }
-                    catch
-                    {
-                        return BadRequest();
-                    }
-                }*/
         [HttpPost("changeStatusNews")]
         public async Task<ActionResult> ChangeStatusNews(int newsId, string status)
         {
@@ -166,6 +152,47 @@ namespace backend.Controllers
             {
                 var result = _newService.GetNewsByPage(page, pageSize);
                 return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("getNewsForEdit")]
+        public async Task<ActionResult> GetNewsForEdit(int newsId)
+        {
+            try
+            {
+                var data = _newService.GetNewsForEdit(newsId);
+                return Ok(data);
+            }
+            catch { return BadRequest(); }
+        }
+
+        [HttpPut("editNews")]
+        public async Task<ActionResult> EditNews(NewsDTO updateNews)
+        {
+            try
+            {
+                var result = _newService.EditNew(updateNews);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        //GET: api/news
+        [HttpGet("getLastestNews")]
+        public async Task<ActionResult> GetLastestNews()
+        {
+            try
+            {
+                var data = await _newService.GetLastestNews();
+                return Ok(data);
             }
             catch
             {

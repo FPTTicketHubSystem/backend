@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/[controller]")]
+
 public class EventRatingController : ControllerBase
 {
     private readonly IEventRatingService _eventRatingService;
@@ -15,6 +16,7 @@ public class EventRatingController : ControllerBase
         _eventRatingService = eventRatingService;
     }
 
+    [Authorize(Roles = "User")]
     [HttpGet("ratingByRatingId")]
     public async Task<ActionResult> RatingByRatingId(int ratingId, int userId)
     {
@@ -33,6 +35,7 @@ public class EventRatingController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "User")]
     [HttpPost("editEventRating")]
     public async Task<ActionResult> EditEventRating([FromBody] Eventrating eventRating)
     {
@@ -48,6 +51,7 @@ public class EventRatingController : ControllerBase
     }
 
     // Thêm các endpoint mới cho Admin
+    [Authorize(Roles = "Admin")]
     [HttpGet("getall")]
     public async Task<ActionResult> GetAllRatings()
     {
@@ -62,6 +66,7 @@ public class EventRatingController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("updateRatingStatus")]
     public async Task<ActionResult> UpdateRatingStatus(int ratingId, string status)
     {
@@ -76,6 +81,7 @@ public class EventRatingController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("deleteRating")]
     public async Task<ActionResult> DeleteRating(int ratingId)
     {
@@ -89,12 +95,15 @@ public class EventRatingController : ControllerBase
             return BadRequest(new { message = "Failed to delete rating." });
         }
     }
+
+    [Authorize(Roles = "Admin")]
     [HttpGet("getRateByEventId")]
     public async Task<IActionResult> GetRateByEventId(int eventId)
     {
         var result = await _eventRatingService.GetRateByEventId(eventId);
         return Ok(result);
     }
+
     [HttpGet("check-status/{eventRatingId}")]
     public async Task<IActionResult> CheckRatingStatus(int eventRatingId)
     {

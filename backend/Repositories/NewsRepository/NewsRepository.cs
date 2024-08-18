@@ -94,7 +94,7 @@ namespace backend.Repositories.NewsRepository
                     Title = newsDTO.Title,
                     Subtitle = newsDTO.Subtitle,
                     Content = newsDTO.Content,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Status = "Chờ duyệt",
                 };
                 _context.News.Add(newNews);
@@ -358,6 +358,89 @@ namespace backend.Repositories.NewsRepository
         public int GetTotalNewsCount()
         {
             return _context.News.Count();
+        }
+
+        public object GetNewsForEdit(int newsId)
+        {
+            var data = _context.News
+                .Where(n => n.NewsId == newsId)
+                .Select(n =>
+                new
+                {
+                    n.NewsId,
+                    n.AccountId,
+                    n.CoverImage,
+                    n.Title,
+                    n.Subtitle,
+                    n.Content,
+                    n.CreateDate,
+                    n.Status
+                }).SingleOrDefault();
+            if (data == null)
+            {
+                return null;
+            }
+            return data;
+        }
+
+        public object EditNew(NewsDTO updateNews)
+        {
+            try
+            {
+                var existingNews = _context.News.FirstOrDefault(e => e.NewsId == updateNews.NewsId);
+
+                if (existingNews == null)
+                {
+                    return new
+                    {
+                        message = "News Not Found",
+                        status = 404
+                    };
+                }
+
+                existingNews.AccountId = updateNews.AccountId;
+                existingNews.CoverImage = updateNews.CoverImage;
+                existingNews.Title = updateNews.Title;
+                existingNews.Subtitle = updateNews.Subtitle;
+                existingNews.Content = updateNews.Content;
+                _context.SaveChanges();
+
+                return new
+                {
+                    message = "News Updated",
+                    status = 200,
+                    existingNews
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Edit News Fail",
+                    status = 400
+                };
+            }
+        }
+
+        public async Task<object> GetNewsByIdUser(int newsId)
+        {
+            var news = await _context.News
+                .Include(n => n.Account)
+                .Where(n => n.NewsId == newsId)
+                .Select(n => new
+                {
+                    n.NewsId,
+                    n.Account.FullName,
+                    n.Account.Avatar,
+                    n.CoverImage,
+                    n.Title,
+                    n.Subtitle,
+                    n.Content,
+                    n.CreateDate,
+                    n.Status,
+                })
+                .FirstOrDefaultAsync();
+            return news;
         }
     }
 }

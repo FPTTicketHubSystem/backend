@@ -1,4 +1,5 @@
 ﻿using backend.DTOs;
+using backend.Helper;
 using backend.Models;
 using backend.Services.OtherService;
 using Microsoft.EntityFrameworkCore;
@@ -95,7 +96,7 @@ namespace backend.Repositories.UserRepository
                 var newAccount = new Account();
                 newAccount.FullName = register.FullName;
                 newAccount.Email = register.Email;
-                newAccount.CreateDate = DateTime.Now;   
+                newAccount.CreateDate = DateTime.UtcNow;   
                 newAccount.Status = "Đang hoạt động";
                 newAccount.Avatar = register.Avatar;
                 newAccount.RoleId = 2;
@@ -188,7 +189,7 @@ namespace backend.Repositories.UserRepository
             account.FullName = register.FullName;
             account.Email = register.Email;
             account.Phone = register.PhoneNumber;
-            account.CreateDate = DateTime.Now;
+            account.CreateDate = DateTime.UtcNow;
             //account.Status = "Chờ xác thực";
             if (register.Status == null)
             {
@@ -212,7 +213,8 @@ namespace backend.Repositories.UserRepository
             {
                 try
                 {
-                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, account.Email, account.Password);
+                    var encyptEmail = EncryptionHelper.EncryptEmail(account.Email);
+                    EmailService.Instance.SendMail(account.Email, 1, account.FullName, encyptEmail, account.Password);
                 }
                 catch
                 {
@@ -227,6 +229,24 @@ namespace backend.Repositories.UserRepository
 
         }
 
+        //public string CreateToken(string email, int id, IConfiguration config)
+        //{
+        //    string role = _context.Roles.Find(id).RoleName;
+        //    List<Claim> claims = new List<Claim>
+        //    {
+        //        new Claim(ClaimTypes.Email, email),
+        //        new Claim(ClaimTypes.Role, role)
+        //    };
+        //    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+        //        config.GetSection("AppSettings:Token").Value!));
+        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+        //    var token = new JwtSecurityToken(
+        //        claims: claims,
+        //        expires: DateTime.Now.AddDays(1),
+        //        signingCredentials: creds);
+        //    var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        //    return "Bearer " + jwt;
+        //}
         public string CreateToken(string email, int id, IConfiguration config)
         {
             string role = _context.Roles.Find(id).RoleName;
@@ -236,14 +256,16 @@ namespace backend.Repositories.UserRepository
                 new Claim(ClaimTypes.Role, role)
             };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                config.GetSection("AppSettings:Token").Value!));
+                config.GetSection("Jwt:Key").Value!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
             var token = new JwtSecurityToken(
+                issuer: config.GetSection("Jwt:Issuer").Value,
+                audience: config.GetSection("Jwt:Audience").Value,
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.UtcNow.AddDays(1),
                 signingCredentials: creds);
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-            return "bearer " + jwt;
+            return "Bearer " + jwt;
         }
 
         public string GenerateRandomString()

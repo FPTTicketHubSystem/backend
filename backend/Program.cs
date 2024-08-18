@@ -23,9 +23,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+using backend.Helper;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using backend.Services.EventRatingService;
 using backend.Repositories.PostCommentRepository;
 using backend.Services.PostCommentService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,9 +45,34 @@ var builder = WebApplication.CreateBuilder(args);
 //    });
 //});
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = builder.Configuration["Jwt:Key"];
+        var issuer = builder.Configuration["Jwt:Issuer"];
+        var audience = builder.Configuration["Jwt:Audience"];
+
+        if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
+        {
+            throw new ArgumentNullException("jwt config values are missing.");
+        }
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        };
+    });
+
 
 // Add services to the container.
-builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles); ;
+builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -55,8 +87,10 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddDbContext<FpttickethubContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FTHSystem")));
 builder.Services.AddSingleton<EmailService>();
+builder.Services.AddSingleton(new PayOS("b2514e3c-d2d6-432a-b1a4-eaaa8b989c88", "f8879890-fd24-41db-bc96-aa21ec3f7abd", "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637"));
 builder.Services.AddHostedService<EmailReminderService>();
 builder.Services.AddHostedService<EmailRatingService>();
+builder.Services.AddHostedService<StaffRemoveService>();
 builder.Services.AddLogging();
 
 // Add CORS
@@ -104,19 +138,22 @@ services.AddScoped<IPostCommentService, PostCommentService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
 // Use CORS
 app.UseCors("CorsPolicy");
 
 app.UseStaticFiles();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

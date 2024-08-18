@@ -2,13 +2,16 @@ using backend.DTOs;
 using backend.Models;
 using backend.Services.EventService;
 using backend.Services.EventStaffService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
+
     [Route("api/eventStaff")]
     [ApiController]
+    [Authorize(Roles = "Organizer")]
     public class EventStaffController : ControllerBase
     {
         private readonly IEventStaffService _eventStaffService;

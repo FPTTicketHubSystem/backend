@@ -1,70 +1,141 @@
-﻿using backend.Services.StatisticService;
-using Microsoft.AspNetCore.Http;
+﻿using backend.DTOs;
+using backend.Services.StatisticService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/statistics")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class StatisticController : ControllerBase
     {
         private readonly IStatisticService _statisticService;
+
         public StatisticController(IStatisticService statisticService)
         {
             _statisticService = statisticService;
         }
-        [HttpGet("total-participants/{eventId}")]
-        public IActionResult GetTotalParticipants(int eventId)
+
+        // GET: api/statistics/monthly-revenue
+        [HttpGet("monthly-revenue")]
+        public async Task<ActionResult<IEnumerable<MonthlyRevenueDTO>>> GetMonthlyRevenue()
         {
             try
             {
-                var totalParticipants = _statisticService.GetTotalParticipants(eventId);
-                return Ok(new { message = "Successfully", status = 200, totalParticipants });
+                var monthlyRevenue = await _statisticService.GetMonthlyRevenue();
+                return Ok(monthlyRevenue);
             }
-            catch (Exception)
+            catch
             {
-                return BadRequest(new { message = "Failed", status = 400 });
-            }
-        }
-        [HttpGet("user-event-count/{userId}")]
-        public IActionResult GetUserEventCount(int userId)
-        {
-            try
-            {
-                var userEventCount = _statisticService.GetUserEventCount(userId);
-                return Ok(new { message = "Successfully", status = 200, userEventCount });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Failed", status = 400 });
+                return BadRequest("Unable to fetch monthly revenue.");
             }
         }
 
-        [HttpGet("total-income/{eventId}")]
-        public IActionResult GetTotalIncome(int eventId)
+        // GET: api/statistics/active-accounts
+        [HttpGet("active-accounts")]
+        public async Task<ActionResult<MonthlyRegisteredUsersDTO>> GetActiveAccount()
         {
             try
             {
-                var totalIncome = _statisticService.GetTotalIncome(eventId);
-                return Ok(new { message = "Successfully", status = 200, totalIncome });
+                var activeAccountCount = await _statisticService.GetMonthlyActiveUsers();
+                return Ok(activeAccountCount);
             }
-            catch (Exception)
+            catch
             {
-                return BadRequest(new { message = "Failed", status = 400 });
+                return BadRequest("Unable to fetch active accounts count.");
             }
         }
 
-        [HttpGet("total-tickets-sold/{eventId}")]
-        public IActionResult GetTotalTicketsSold(int eventId)
+        // GET: api/statistics/top-rated-events
+        [HttpGet("top-rated-events")]
+        public async Task<ActionResult<IEnumerable<TopRatedEventDTO>>> GetTopRatedEvents()
         {
             try
             {
-                var totalTicketsSold = _statisticService.GetTotalTicketsSold(eventId);
-                return Ok(new { message = "Successfully", status = 200, totalTicketsSold });
+                var topRatedEvents = await _statisticService.GetTopRatedEvents();
+                return Ok(topRatedEvents);
             }
-            catch (Exception)
+            catch
             {
-                return BadRequest(new { message = "Failed", status = 400 });
+                return BadRequest("Unable to fetch top-rated events.");
+            }
+        }
+
+        // GET: api/statistics/event-revenue
+        [HttpGet("event-revenue")]
+        public async Task<ActionResult<IEnumerable<EventRevenueDTO>>> GetEventRevenue()
+        {
+            try
+            {
+                var eventRevenues = await _statisticService.GetEventRevenue();
+                return Ok(eventRevenues);
+            }
+            catch
+            {
+                return BadRequest("Unable to fetch event revenue.");
+            }
+        }
+
+        // GET: api/statistics/top-participants
+        [HttpGet("top-participants")]
+        public async Task<ActionResult<IEnumerable<TopParticipantsDTO>>> GetTopParticipants()
+        {
+            try
+            {
+                var topParticipants = await _statisticService.GetTopParticipants();
+                return Ok(topParticipants);
+            }
+            catch
+            {
+                return BadRequest("Unable to fetch top participants.");
+            }
+        }
+
+        // GET: api/statistics/top-revenue-events
+        [HttpGet("top-revenue-events")]
+        public async Task<ActionResult<IEnumerable<TopRevenueEventDTO>>> GetTopRevenueEvents()
+        {
+            try
+            {
+                var topRevenueEvents = await _statisticService.GetTopRevenueEvents();
+                return Ok(topRevenueEvents);
+            }
+            catch
+            {
+                return BadRequest("Unable to fetch top revenue events.");
+            }
+        }
+
+        // GET: api/statistics/top-participants-events
+        [HttpGet("top-participants-events")]
+        public async Task<ActionResult<IEnumerable<TopParticipantsEventDTO>>> GetTopParticipantsEvents()
+        {
+            try
+            {
+                var topParticipantsEvents = await _statisticService.GetTopParticipantsEvents();
+                return Ok(topParticipantsEvents);
+            }
+            catch
+            {
+                return BadRequest("Unable to fetch top participants events.");
+            }
+        }
+
+        // GET: api/statistics/report
+        [HttpGet("report")]
+        public async Task<IActionResult> GenerateEventStatisticsReport()
+        {
+            try
+            {
+                var pdfData = await _statisticService.GenerateEventStatisticsReport();
+                return File(pdfData, "application/pdf", "EventStatisticsReport.pdf");
+            }
+            catch
+            {
+                return BadRequest("Unable to generate statistics report.");
             }
         }
     }

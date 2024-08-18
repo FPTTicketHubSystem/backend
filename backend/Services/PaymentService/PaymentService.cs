@@ -2,6 +2,8 @@
 using backend.Models;
 using backend.Repositories.NewsRepository;
 using backend.Repositories.PaymentRepository;
+using Microsoft.Extensions.Logging;
+using static Azure.Core.HttpHeader;
 
 namespace backend.Services.PaymentService
 {
@@ -14,9 +16,19 @@ namespace backend.Services.PaymentService
             _paymentRepository = paymentRepository;
         }
 
+        public object CancelOrderOfUser(int userId)
+        {
+            return _paymentRepository.CancelOrderOfUser(userId);
+        }
+
         public object CheckInputCoupon(int eventId, string coupon)
         {
             return _paymentRepository.CheckInputCoupon(eventId, coupon);
+        }
+
+        public object CheckOrderdOfUser(int userId, int eventId)
+        {
+            return _paymentRepository.CheckOrderdOfUser(userId, eventId);
         }
 
         public object DeleteTimeOutOrder(PaymentDTO paymentDTO)

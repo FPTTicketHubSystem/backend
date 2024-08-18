@@ -1,6 +1,8 @@
 ﻿using backend.DTOs;
+using backend.Helper;
 using backend.Models;
 using backend.Services.UserService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +24,7 @@ namespace backend.Controllers
             _configuration = configuration;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> Login(Login login)
         {
@@ -37,7 +40,7 @@ namespace backend.Controllers
         }
 
 
-
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult> Register(Register register)
         {
@@ -57,12 +60,14 @@ namespace backend.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet("confirm")]
         public async Task<ActionResult> ConfirmAccount(string email)
         {
             try
             {
-                var _user = _db.Accounts.SingleOrDefault(x => x.Email.Equals(email));
+                var decryptedEmail = EncryptionHelper.DecryptEmail(email);
+                var _user = _db.Accounts.SingleOrDefault(x => x.Email.Equals(decryptedEmail));
                 if (_user == null)
                 {
                     return NotFound();
@@ -82,6 +87,7 @@ namespace backend.Controllers
             }
         }
 
+
         [HttpGet("getAllPhone")]
         public async Task<ActionResult> GetAllPhone()
         {
@@ -98,6 +104,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
+        [AllowAnonymous]
         [HttpPost("forgotPassword")]
         public async Task<ActionResult> ChangePassword(string email)
         {
@@ -112,6 +119,7 @@ namespace backend.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("loginByGoogle")]
         public async Task<ActionResult> LoginByGoogle(Register register)
         {
@@ -126,7 +134,7 @@ namespace backend.Controllers
             }
         }
 
-
+        [AllowAnonymous]
         [HttpGet("search")]
         public async Task<ActionResult> SearchInforByEmail(string email)
         {
@@ -140,7 +148,6 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
         //[HttpGet("weeklyActivity")]
         //public async Task<ActionResult> WeeklyActivity(int accountId)
         //{
