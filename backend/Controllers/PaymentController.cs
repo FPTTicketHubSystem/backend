@@ -5,6 +5,7 @@ using backend.Models;
 using backend.Services.NewsService;
 using backend.Services.OtherService;
 using backend.Services.PaymentService;
+using MailKit.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -161,9 +162,18 @@ namespace backend.Controllers
                 Payment paymentSignUp = new Payment();
 
 
-                var checkOrderDetails = _context.Orderdetails.FirstOrDefault(x => x.OrderId == returnPaymentURL.OrderId);
-                var checkTicketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == checkOrderDetails.TicketTypeId);
-                if (checkTicketType.Price > 0)
+                var checkOrderDetails = _context.Orderdetails.Where(x => x.OrderId == returnPaymentURL.OrderId).ToList();
+                bool isFree = true;
+                foreach (var detail in checkOrderDetails)
+                {
+                    var ticketType = _context.Tickettypes.SingleOrDefault(x => x.TicketTypeId == detail.TicketTypeId);
+                    if (ticketType != null && ticketType.Price > 0)
+                    {
+                        isFree = false;
+                        break;
+                    }
+                }
+                if (!isFree)
                 {
 
                     //PayOS _payOS = new PayOS("b2514e3c-d2d6-432a-b1a4-eaaa8b989c88", "f8879890-fd24-41db-bc96-aa21ec3f7abd", "100f66bc876b8ed977fa4cde1864a4065394dc0e82e7f8a8b37a8e74d07da637");

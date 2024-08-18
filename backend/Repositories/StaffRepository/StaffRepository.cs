@@ -161,7 +161,7 @@ namespace backend.Repositories.StaffRepository
                     EventId = g.Key.EventId,
                     EventName = g.Key.EventName,
                     EventDate = g.Key.StartTime,
-                    Checkins = g.Select(t => new
+                    Checkins = g.OrderByDescending(t => t.CheckInDate).Select(t => new
                     {
                         t.TicketId,
                         t.CheckInDate,
