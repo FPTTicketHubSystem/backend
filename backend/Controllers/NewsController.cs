@@ -119,20 +119,6 @@ namespace backend.Controllers
             catch { return BadRequest(); }
         }*/
 
-        /*        //GET: api/news
-                [HttpGet("getLastestNews")]
-                public async Task<ActionResult> GetLastestNews()
-                {
-                    try
-                    {
-                        var data = await _newService.GetLastestNews();
-                        return Ok(data);
-                    }
-                    catch
-                    {
-                        return BadRequest();
-                    }
-                }*/
         [HttpPost("changeStatusNews")]
         public async Task<ActionResult> ChangeStatusNews(int newsId, string status)
         {
@@ -191,6 +177,22 @@ namespace backend.Controllers
             {
                 var result = _newService.EditNew(updateNews);
                 return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
+
+
+        //GET: api/news
+        [HttpGet("getLastestNews")]
+        public async Task<ActionResult> GetLastestNews()
+        {
+            try
+            {
+                var data = await _newService.GetLastestNews();
+                return Ok(data);
             }
             catch
             {

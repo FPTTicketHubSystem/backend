@@ -421,6 +421,27 @@ namespace backend.Repositories.NewsRepository
                 };
             }
         }
+
+        public async Task<object> GetNewsByIdUser(int newsId)
+        {
+            var news = await _context.News
+                .Include(n => n.Account)
+                .Where(n => n.NewsId == newsId)
+                .Select(n => new
+                {
+                    n.NewsId,
+                    n.Account.FullName,
+                    n.Account.Avatar,
+                    n.CoverImage,
+                    n.Title,
+                    n.Subtitle,
+                    n.Content,
+                    n.CreateDate,
+                    n.Status,
+                })
+                .FirstOrDefaultAsync();
+            return news;
+        }
     }
 }
 

@@ -66,6 +66,10 @@ namespace backend.Services.NewsService
         {
             return _newsRepository.EditNew(updateNews);
         }
+        public async Task<object> GetLastestNews()
+        {
+            return await _newsRepository.GetLastestNews();
+        }
     }
 }
 

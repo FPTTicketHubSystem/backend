@@ -343,7 +343,7 @@ namespace backend.Repositories.PaymentRepository
 
         public object CheckOrderdOfUser(int userId, int eventId)
         {
-            var getOrdered = _context.Orders.SingleOrDefault(x => x.AccountId == userId && (x.Status == "Đang xử lý" || x.Status == "Đã thanh toán"));
+            var getOrdered = _context.Orders.FirstOrDefault(x => x.AccountId == userId && x.Orderdetails.FirstOrDefault().TicketType.EventId == eventId && (x.Status == "Đang xử lý" || x.Status == "Đã thanh toán"));
             if (getOrdered != null)
             {
                 var getOrderDetail = _context.Orderdetails.Where(x => x.OrderId == getOrdered.OrderId).FirstOrDefault();
