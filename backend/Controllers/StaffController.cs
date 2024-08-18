@@ -30,11 +30,11 @@ namespace backend.Controllers
             }
         }
         [HttpGet("checkinHistory")]
-        public async Task<ActionResult> GetCheckinHistoryByEvent(int eventId, int staffId)
+        public async Task<ActionResult> GetCheckinHistoryByEvent(int staffId)
         {
             try
             {
-                var data = _staffService.GetCheckinHistoryByEvent(eventId, staffId);
+                var data = await _staffService.GetCheckinHistoryByEvent(staffId);
                 return Ok(data);
             }
             catch

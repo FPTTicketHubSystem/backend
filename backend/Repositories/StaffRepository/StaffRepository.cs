@@ -139,30 +139,43 @@ namespace backend.Repositories.StaffRepository
             }
         }
 
-        public async Task<object> GetCheckinHistoryByEvent (int eventId, int staffId)
+        public async Task<object> GetCheckinHistoryByEvent(int staffId)
         {
+            var today = DateTime.UtcNow.Date;
+
             var data = _context.Tickets
                 .Include(t => t.OrderDetail)
-                .Where(t => t.IsCheckedIn == true && t.OrderDetail.TicketType.Event.EventId == eventId && t.OrderDetail.TicketType.Event.Eventstaffs.Any(es => es.AccountId == staffId))
-                .OrderByDescending(t => t.CheckInDate)
-                .Select(t => new
+                .ThenInclude(od => od.TicketType)
+                .ThenInclude(tt => tt.Event)
+                .Where(t => t.IsCheckedIn == true && t.CheckInDate.HasValue && t.CheckInDate.Value.Date == today
+                            && t.OrderDetail.TicketType.Event.Eventstaffs.Any(es => es.AccountId == staffId))
+                .GroupBy(t => new
                 {
-                    t.TicketId,
-                    t.CheckInDate,
-                    t.OrderDetail.TicketType.TypeName,
-                    t.OrderDetail.Order.Account.FullName,
-                    t.OrderDetail.Order.Account.Email,
-                    t.OrderDetail.Order.Account.Phone,
-                });
-            if (data == null)
-            {
-                return null;
-            }
-            else
-            {
-                return data;
-            }
+                    t.OrderDetail.TicketType.Event.EventId,
+                    t.OrderDetail.TicketType.Event.EventName,
+                    t.OrderDetail.TicketType.Event.StartTime
+                })
+                .OrderByDescending(g => g.Key.StartTime)
+                .Select(g => new
+                {
+                    EventId = g.Key.EventId,
+                    EventName = g.Key.EventName,
+                    EventDate = g.Key.StartTime,
+                    Checkins = g.Select(t => new
+                    {
+                        t.TicketId,
+                        t.CheckInDate,
+                        t.OrderDetail.TicketType.TypeName,
+                        t.OrderDetail.Order.Account.FullName,
+                        t.OrderDetail.Order.Account.Email,
+                        t.OrderDetail.Order.Account.Phone,
+                        t.OrderDetail.Quantity
+                    }).ToList()
+                }).ToList();
+
+            return data;
         }
+
         public async Task<object> GetEventByStaff(int staffId)
         {
             var data = _context.Events

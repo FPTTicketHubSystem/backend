@@ -15,9 +15,9 @@ namespace backend.Services.StaffService
         {
             return _staffRepository.CheckInTicket (ticketId, staffId);
         }
-        public async Task<object> GetCheckinHistoryByEvent(int eventId, int staffId)
+        public async Task<object> GetCheckinHistoryByEvent(int staffId)
         {
-            return _staffRepository.GetCheckinHistoryByEvent (eventId, staffId);
+            return await _staffRepository.GetCheckinHistoryByEvent (staffId);
         }
         public async Task<object> GetEventByStaff(int staffId)
         {
