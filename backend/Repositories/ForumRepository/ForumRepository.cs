@@ -75,7 +75,7 @@ namespace backend.Repositories.ForumRepository
         public dynamic GetPostByStatus(string? status, int accountId)
         {
             var checkAccount = _context.Accounts.SingleOrDefault(a => a.AccountId == accountId);
-            if (checkAccount.RoleId == 1 || checkAccount.RoleId == 2)
+            if (checkAccount.RoleId == 1)
             {
                 var posts = _context.Posts
                 .Include(p => p.Postcomments)
@@ -170,7 +170,7 @@ namespace backend.Repositories.ForumRepository
             }
             else
             {
-                post.Status = "Deleted";
+                post.Status = "Đã xóa";
                 _context.SaveChanges();
                 return new
                 {
@@ -182,7 +182,7 @@ namespace backend.Repositories.ForumRepository
         public object RejectPost(int postId)
         {
             var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
-            if (post == null || post.Status != "Pending")
+            if (post == null || post.Status != "Chờ duyệt")
             {
                 return new
                 {
@@ -192,7 +192,7 @@ namespace backend.Repositories.ForumRepository
             }
             else
             {
-                post.Status = "Rejected";
+                post.Status = "Từ chối";
                 _context.SaveChanges();
                 return new
                 {
@@ -218,7 +218,7 @@ namespace backend.Repositories.ForumRepository
                 {
                     AccountId = accountId,
                     PostId = postId,
-                    Status = "Saved"
+                    Status = "Đã lưu"
                 };
                 var checkExist = _context.Postfavorites.Any(c => c.PostId == postId && c.AccountId == accountId);
                 {
@@ -272,7 +272,7 @@ namespace backend.Repositories.ForumRepository
             {
                 var posts = _context.Postfavorites
                     .Include(p => p.Post)
-                    .Where(p => p.AccountId == accountId && p.Status == "Saved" && p.Post.Status == "Approved")
+                    .Where(p => p.AccountId == accountId && p.Status == "Đã lưu" && p.Post.Status == "Đã duyệt")
                     .OrderByDescending(p => p.Post.CreateDate)
                     .Select(p =>
                 new
@@ -443,7 +443,6 @@ namespace backend.Repositories.ForumRepository
                 };
             }
         }
-
         public async Task<object> GetAllPostAdmin()
         {
             var data = await _context.Posts
@@ -469,6 +468,5 @@ namespace backend.Repositories.ForumRepository
 
             return data;
         }
-
     }
 }

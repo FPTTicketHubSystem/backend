@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/comment")]
     [ApiController]
     public class PostCommentController : ControllerBase
     {
@@ -27,7 +27,7 @@ namespace backend.Controllers
                 postcomment.AccountId = addPostcomment.AccountId;
                 postcomment.Content = addPostcomment.Content;
                 postcomment.FileComment = addPostcomment.FileComment;
-                postcomment.Status = "Uploaded";
+                postcomment.Status = "Đã bình luận";
                 postcomment.CommentDate = DateTime.Now;
                 var result = _postcommentService.AddPostcomment(postcomment);
 
@@ -77,6 +77,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
+
         [HttpPost("DeleteComment")]
         public async Task<IActionResult> DeleteComment(int commentId)
         {

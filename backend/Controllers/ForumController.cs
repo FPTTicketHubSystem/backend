@@ -50,7 +50,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("AddPost")]
-        public async Task<ActionResult> AddPost([FromBody] PostDTO addPost)
+        public async Task<ActionResult> AddPost([FromBody] ForumDTO addPost)
         {
             try
             {
@@ -58,7 +58,7 @@ namespace backend.Controllers
                 post.AccountId = addPost.AccountId;
                 post.PostText = addPost.PostText;
                 post.PostFile = addPost.PostFile;
-                post.Status = "Pending";
+                post.Status = "Chờ duyệt";
                 post.CreateDate = DateTime.Now;
                 var result = _postService.AddPost(post);
                 return Ok(result);
