@@ -148,6 +148,33 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+
+        [AllowAnonymous]
+        [HttpGet("server-timezone")]
+        public ActionResult GetServerTimeZone()
+        {
+            try
+            {
+                var serverTime = DateTime.Now;
+                var serverTimeUtc = DateTime.UtcNow;
+                var timeZone = TimeZoneInfo.Local;
+
+                var result = new
+                {
+                    LocalTime = serverTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    UtcTime = serverTimeUtc.ToString("yyyy-MM-dd HH:mm:ss"),
+                    TimeZone = timeZone.Id,
+                    TimeZoneOffset = timeZone.GetUtcOffset(serverTime).ToString()
+                };
+
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest("Unable to retrieve server time zone information.");
+            }
+        }
+
         //[HttpGet("weeklyActivity")]
         //public async Task<ActionResult> WeeklyActivity(int accountId)
         //{

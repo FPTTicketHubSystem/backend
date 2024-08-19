@@ -39,7 +39,7 @@ namespace backend.Services.OtherService
                     var _context = scope.ServiceProvider.GetRequiredService<FpttickethubContext>();
                     var emailService = EmailService.Instance;
 
-                    var tomorrow = DateTime.Now.Date.AddDays(1);
+                    var tomorrow = DateTime.UtcNow.Date.AddDays(1);
 
                     var upcomingEvents = _context.Events
                         .Where(e => EF.Functions.DateDiffDay(e.StartTime, tomorrow) == 0)
