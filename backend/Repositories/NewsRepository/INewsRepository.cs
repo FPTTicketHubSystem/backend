@@ -17,6 +17,7 @@ namespace backend.Repositories.NewsRepository
         object GetNewsForEdit(int newsId);
         object EditNew(NewsDTO updateNews);
         Task<object> GetLastestNews();
+        Task<object> GetNewsByIdUser(int newsId);
 
     }
 }

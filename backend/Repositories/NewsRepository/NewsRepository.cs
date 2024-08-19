@@ -426,7 +426,7 @@ namespace backend.Repositories.NewsRepository
         {
             var news = await _context.News
                 .Include(n => n.Account)
-                .Where(n => n.NewsId == newsId)
+                .Where(n => n.NewsId == newsId && n.Status == "Đã duyệt")
                 .Select(n => new
                 {
                     n.NewsId,
@@ -440,8 +440,17 @@ namespace backend.Repositories.NewsRepository
                     n.Status,
                 })
                 .FirstOrDefaultAsync();
+            if (news == null)
+            {
+                return new
+                {
+                    status = 404,
+                    message = "NotFound"
+                };
+            }
             return news;
         }
+
     }
 }
 

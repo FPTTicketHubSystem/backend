@@ -70,6 +70,10 @@ namespace backend.Services.NewsService
         {
             return await _newsRepository.GetLastestNews();
         }
+        public async Task<object> GetNewsByIdUser(int newsId)
+        {
+            return await _newsRepository.GetNewsByIdUser(newsId);
+        }
     }
 }
 

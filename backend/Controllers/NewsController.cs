@@ -199,6 +199,20 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+
+        [HttpGet("getNewsByIdUser")]
+        public async Task<ActionResult> GetNewsByIdUser(int newsId)
+        {
+            try
+            {
+                var data = await _newService.GetNewsByIdUser(newsId);
+                return Ok(data);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }
 
