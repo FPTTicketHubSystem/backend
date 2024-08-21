@@ -22,6 +22,7 @@ namespace backend.Repositories.TicketRepository
                 .Select(t =>
                 new
                 {
+                    orderCode = "FTH2024" + t.OrderDetail.Order.OrderId,
                     t.TicketId,
                     t.OrderDetail.TicketType.TypeName,
                     t.OrderDetail.TicketType.Event.EventName,

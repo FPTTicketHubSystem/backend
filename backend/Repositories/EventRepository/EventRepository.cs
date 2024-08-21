@@ -515,6 +515,14 @@ namespace backend.Repositories.EventRepository
                     status = 400
                 };
             }
+            if ((data.Quantity + addQuantity) < 0)
+            {
+                return new
+                {
+                    message = "InvalidQuantity",
+                    status = 400
+                };
+            }
             data.Quantity += addQuantity;
             _context.Tickettypes.Update(data);
             _context.SaveChanges();
@@ -553,6 +561,16 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
+                var existingDiscountCode = _context.Discountcodes.FirstOrDefault(dc => dc.EventId == discountcode.EventId && dc.Code == discountcode.Code);
+                if (existingDiscountCode != null)
+                {
+                    return new
+                    {
+                        message = "DiscountCodeIsExist",
+                        status = 400
+                    };
+                }
+
                 var newDiscountCode = new Discountcode
                 {
                     AccountId = discountcode.AccountId,
@@ -591,6 +609,14 @@ namespace backend.Repositories.EventRepository
                 return new
                 {
                     message = "NotFound",
+                    status = 400
+                };
+            }
+            if ((data.Quantity + addQuantity) < 0)
+            {
+                return new
+                {
+                    message = "InvalidQuantity",
                     status = 400
                 };
             }
@@ -782,7 +808,7 @@ namespace backend.Repositories.EventRepository
                         if (filterValue.Equals("Nghệ thuật"))
                         {
                             var checkEventByCategory1 = _context.Events.Include(e => e.Tickettypes)
-                                .Where(x => x.CategoryId == 1 && x.EventId == events.EventId && x.Status == "Đã duyệt") 
+                                .Where(x => x.CategoryId == 1 && x.EventId == events.EventId && x.Status == "Đã duyệt")
                                 .ToList();
                             foreach (var eventByCategory1 in checkEventByCategory1)
                             {
@@ -823,7 +849,7 @@ namespace backend.Repositories.EventRepository
                 }
 
                 var resultFilter = listWhenFilter.GroupBy(e => e.EventId)
-                    .Select(g => g.First())
+                    .Select(g => g.First()).OrderBy(e => e.StartTime)
                     .ToList();
 
                 return new
@@ -874,6 +900,15 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
+                var existingTicketType = _context.Tickettypes.FirstOrDefault(tt => tt.EventId == ticketType.EventId && tt.TypeName == ticketType.TypeName);
+                if (existingTicketType != null)
+                {
+                    return new
+                    {
+                        message = "TicketTypeIsExist",
+                        status = 400
+                    };
+                }
                 var newTicketType = new Tickettype
                 {
                     EventId = ticketType.EventId,

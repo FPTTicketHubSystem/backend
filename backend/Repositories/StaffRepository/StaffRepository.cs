@@ -55,7 +55,7 @@ namespace backend.Repositories.StaffRepository
                 };
             }
 
-            if (data.eventEndTime.HasValue && (now > data.eventStartTime.Value.AddMinutes(45)))
+            if (data.eventEndTime.HasValue && (now > data.eventEndTime))
             {
                 return new
                 {
