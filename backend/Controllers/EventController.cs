@@ -299,5 +299,21 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
+
+        //update for organizer
+
+        [HttpPost("addTicketType")]
+        public async Task<ActionResult> AddTicketType(TicketTypeDTO ticketType)
+        {
+            try
+            {
+                var result = _eventService.AddTicketType(ticketType);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

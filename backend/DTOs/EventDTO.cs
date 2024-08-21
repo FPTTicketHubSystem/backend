@@ -21,14 +21,15 @@ namespace backend.Models
         //public List<DiscountCodeDTO> DiscountCodes { get; set; }
     }
 
-    //public class EventImageDTO
-    //{
-    //    public string ImageUrl { get; set; }
-    //    public string Status { get; set; }
-    //}
+    public class EventImageDTO
+    {
+        public string ImageUrl { get; set; }
+        public string Status { get; set; }
+    }
 
     public class TicketTypeDTO
     {
+        public int EventId { get; set; }
         public string TypeName { get; set; }
         public decimal Price { get; set; }
         public int Quantity { get; set; }

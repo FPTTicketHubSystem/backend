@@ -136,11 +136,17 @@ namespace backend.Services.EventService
 
         public object searchEventByFilter(string filter)
         {
-            return _eventRepository.searchEventByFilter(filter);    
+            return _eventRepository.searchEventByFilter(filter);
         }
         public async Task<object> GetAllEventUser()
         {
             return _eventRepository.GetAllEventUser();
+        }
+
+        //update for organizer
+        public object AddTicketType(TicketTypeDTO ticketType)
+        {
+            return _eventRepository.AddTicketType(ticketType);
         }
     }
 }

@@ -97,6 +97,15 @@ namespace backend.Repositories.EventRepository
                         status = 400
                     };
                 }
+
+                //if (!newEventDto.EventImages.Any())
+                //{
+                //    return new
+                //    {
+                //        status = 400,
+                //        message = "Doc is required"
+                //    };
+                //}
                 var newEvent = new Event
                 {
                     AccountId = newEventDto.AccountId,
@@ -285,7 +294,7 @@ namespace backend.Repositories.EventRepository
                 .Include(e => e.Eventratings)
                 .Include(e => e.Tickettypes)
                 .Include(e => e.Discountcodes)
-                .Where(e => e.EventId == eventId)
+                .Where(e => e.EventId == eventId && e.Status == "Đã duyệt")
                 .Select(e =>
                 new
                 {
@@ -306,7 +315,11 @@ namespace backend.Repositories.EventRepository
                 }).SingleOrDefault();
             if (data == null)
             {
-                return null;
+                return new
+                {
+                    status = 404,
+                    message = "NotFound"
+                };
             }
             return data;
         }
@@ -513,6 +526,8 @@ namespace backend.Repositories.EventRepository
             };
         }
 
+
+
         public async Task<object> GetDiscountCodeByEvent(int eventId)
         {
             var data = _context.Discountcodes
@@ -549,7 +564,7 @@ namespace backend.Repositories.EventRepository
                 };
 
                 _context.Discountcodes.Add(newDiscountCode);
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
 
                 return new
                 {
@@ -634,7 +649,7 @@ namespace backend.Repositories.EventRepository
                 select new TicketSalesPerTicketType
                 {
                     TicketType = g.Key.TypeName,
-                    NumberOfTicketsSold = g.Count(),
+                    NumberOfTicketsSold = (int)g.Sum(od => od.Quantity),
                     RemainingTickets = (int)g.Key.Quantity
                 }
             ).ToListAsync();
@@ -852,6 +867,39 @@ namespace backend.Repositories.EventRepository
                     e.Status
                 });
             return data;
+        }
+
+        //update for organizer
+        public object AddTicketType(TicketTypeDTO ticketType)
+        {
+            try
+            {
+                var newTicketType = new Tickettype
+                {
+                    EventId = ticketType.EventId,
+                    TypeName = ticketType.TypeName,
+                    Price = ticketType.Price,
+                    Quantity = ticketType.Quantity
+                };
+
+                _context.Tickettypes.Add(newTicketType);
+                _context.SaveChanges();
+
+                return new
+                {
+                    message = "Add TicketType Success",
+                    status = 200,
+                    newTicketType
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    message = "Add TicketType Fail",
+                    status = 400
+                };
+            }
         }
 
     }

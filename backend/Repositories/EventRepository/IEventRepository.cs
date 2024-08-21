@@ -32,5 +32,8 @@ namespace backend.Repositories.EventRepository
         object searchEventByContainTiTile(string searchString);
         object searchEventByFilter(string filter);
         Task<object> GetAllEventUser();
+
+        //update for organizer
+        object AddTicketType(TicketTypeDTO ticketType);
     }
 }
