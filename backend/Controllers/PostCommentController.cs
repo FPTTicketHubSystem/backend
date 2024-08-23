@@ -8,6 +8,7 @@ namespace backend.Controllers
 {
     [Route("api/comment")]
     [ApiController]
+    //user
     public class PostCommentController : ControllerBase
     {
         private readonly IPostCommentService _postcommentService;

@@ -17,6 +17,7 @@ namespace backend.Controllers
         }
 
         //GET: api/news
+        
         [HttpGet("getAllNews")]
         public async Task<ActionResult> GetAllNews()
         {
@@ -30,7 +31,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
+        //admin
         [HttpGet("getAllNewsAdmin")]
         public async Task<ActionResult> GetAllNewsAdmin([FromQuery] string status = "")
         {
@@ -60,6 +61,7 @@ namespace backend.Controllers
         }*/
 
         //GET: api/news
+        //organizer
         [HttpGet("getNewsByAccount")]
         public async Task<ActionResult> GetNewsByAccount(int accountId)
         {
@@ -75,6 +77,7 @@ namespace backend.Controllers
         }
 
         // POST: api/news
+        //organizer
         [HttpPost("addNews")]
         public async Task<ActionResult> AddNews(NewsDTO newsDTO)
         {
@@ -88,7 +91,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
+        //admin
         [HttpGet("getNewsById/{newsId}")]
         public async Task<ActionResult> GetNewsById(int newsId)
         {
@@ -118,7 +121,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }*/
-
+        //admin
         [HttpPost("changeStatusNews")]
         public async Task<ActionResult> ChangeStatusNews(int newsId, string status)
         {
@@ -158,7 +161,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
+        //organizer
         [HttpGet("getNewsForEdit")]
         public async Task<ActionResult> GetNewsForEdit(int newsId)
         {
@@ -169,7 +172,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
-
+        //organizer
         [HttpPut("editNews")]
         public async Task<ActionResult> EditNews(NewsDTO updateNews)
         {
@@ -199,7 +202,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
+        //organizer
         [HttpGet("getNewsByIdUser")]
         public async Task<ActionResult> GetNewsByIdUser(int newsId)
         {

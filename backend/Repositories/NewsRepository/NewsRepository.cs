@@ -1,4 +1,5 @@
 ﻿using backend.DTOs;
+using backend.Helper;
 using backend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -91,8 +92,8 @@ namespace backend.Repositories.NewsRepository
                 {
                     AccountId = newsDTO.AccountId,
                     CoverImage = newsDTO.CoverImage,
-                    Title = newsDTO.Title,
-                    Subtitle = newsDTO.Subtitle,
+                    Title = StringHelpers.NormalizeSpaces(newsDTO.Title),
+                    Subtitle = StringHelpers.NormalizeSpaces(newsDTO.Subtitle),
                     Content = newsDTO.Content,
                     CreateDate = DateTime.UtcNow,
                     Status = "Chờ duyệt",
@@ -245,8 +246,8 @@ namespace backend.Repositories.NewsRepository
                     status = 400,
                 };
             }
-            news.Title = newsDTO.Title;
-            news.Subtitle = newsDTO.Subtitle;
+            news.Title = StringHelpers.NormalizeSpaces(newsDTO.Title);
+            news.Subtitle = StringHelpers.NormalizeSpaces(newsDTO.Subtitle);
             news.CoverImage = newsDTO.CoverImage;
             news.Content = newsDTO.Content;
             _context.SaveChanges();
@@ -400,8 +401,8 @@ namespace backend.Repositories.NewsRepository
 
                 existingNews.AccountId = updateNews.AccountId;
                 existingNews.CoverImage = updateNews.CoverImage;
-                existingNews.Title = updateNews.Title;
-                existingNews.Subtitle = updateNews.Subtitle;
+                existingNews.Title = StringHelpers.NormalizeSpaces(updateNews.Title);
+                existingNews.Subtitle = StringHelpers.NormalizeSpaces(updateNews.Subtitle);
                 existingNews.Content = updateNews.Content;
                 _context.SaveChanges();
 

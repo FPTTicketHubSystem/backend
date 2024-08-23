@@ -96,7 +96,7 @@ public class EventRatingController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Organizer")]
     [HttpGet("getRateByEventId")]
     public async Task<IActionResult> GetRateByEventId(int eventId)
     {

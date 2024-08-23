@@ -78,9 +78,9 @@ namespace backend.Services.EventService
             var result = _eventRepository.GetTicketTypeByEvent(eventId);
             return result;
         }
-        public async Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity)
+        public async Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity, int addOrRemove)
         {
-            var result = _eventRepository.UpdateTicketQuantity(ticketTypeId, addQuantity);
+            var result = _eventRepository.UpdateTicketQuantity(ticketTypeId, addQuantity, addOrRemove);
             return result;
         }
         public async Task<object> GetDiscountCodeByEvent(int eventId)

@@ -19,7 +19,7 @@ namespace backend.Repositories.EventRepository
         Task<object> GetEventByAccount(int accountId);
         //update for event organizer manage
         Task<object> GetTicketTypeByEvent(int eventId);
-        Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity);
+        Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity, int addOrRemove);
         Task<object> GetDiscountCodeByEvent(int eventId);
         object AddDiscountCode(DiscountCodeDTO discountcode);
         Task<object> UpdateDiscountQuantity(int discountId, int addQuantity);

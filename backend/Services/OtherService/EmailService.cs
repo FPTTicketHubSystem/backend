@@ -153,6 +153,7 @@ namespace backend.Services.OtherService
             {
                 // With type == 1, the first event by an account is approved, the account is become organizer
                 // With type == 2, event approved
+                // With type == 2, event rejected
                 string _text = "";
                 string subject = "";
                 if (type == 1)
@@ -164,6 +165,12 @@ namespace backend.Services.OtherService
                 {
                     _text = EmailHelper.Instance.ApprovedEventEmail(mail, fullname, eventName);
                     subject = "FPTTicketHub - Sự kiện của bạn đã được duyệt";
+                }
+
+                if (type == 3)
+                {
+                    _text = EmailHelper.Instance.RejectEventEmail(mail, fullname, eventName);
+                    subject = "FPTTicketHub - Sự kiện của bạn đã bị từ chối";
                 }
 
                 var email = new MimeMessage();

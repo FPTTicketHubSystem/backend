@@ -68,7 +68,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-
+        //admin
         [HttpPost("ChangeStatusPost")]
         public async Task<ActionResult> ChangeStatusPost(int postId, string status)
         {
@@ -219,7 +219,7 @@ namespace backend.Controllers
             var posts = _postService.GetSavedPostByAccountId(accountId);
             return Ok(posts);
         }
-
+        //admin
         [HttpGet("getAllPostAdmin")]
         public async Task<ActionResult> GetAllPostAdmin()
         {

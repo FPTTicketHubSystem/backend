@@ -184,11 +184,11 @@ namespace backend.Controllers
 
         [Authorize(Roles = "Organizer,User")]
         [HttpPut("updateTicketQuantity")]
-        public async Task<ActionResult> UpdateTicketQuantity(int ticketTypeId, int addQuantity)
+        public async Task<ActionResult> UpdateTicketQuantity(int ticketTypeId, int addQuantity, int addOrRemove)
         {
             try
             {
-                var data = _eventService.UpdateTicketQuantity(ticketTypeId, addQuantity);
+                var data = _eventService.UpdateTicketQuantity(ticketTypeId, addQuantity, addOrRemove);
                 return Ok(data);
             }
             catch { return BadRequest(); }

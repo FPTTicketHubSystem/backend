@@ -1,4 +1,5 @@
-﻿using backend.Models;
+﻿using backend.Helper;
+using backend.Models;
 using backend.Services.OtherService;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -80,6 +81,14 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
+                if (string.IsNullOrEmpty(newEventDto.ThemeImage))
+                {
+                    return new
+                    {
+                        message = "Image is required",
+                        status = 400
+                    };
+                }
                 if (!newEventDto.TicketTypes.Any())
                 {
                     return new
@@ -110,14 +119,14 @@ namespace backend.Repositories.EventRepository
                 {
                     AccountId = newEventDto.AccountId,
                     CategoryId = newEventDto.CategoryId,
-                    EventName = newEventDto.EventName,
+                    EventName = StringHelpers.NormalizeSpaces(newEventDto.EventName),
                     ThemeImage = newEventDto.ThemeImage,
                     EventDescription = newEventDto.EventDescription,
                     Address = newEventDto.Address,
-                    Location = newEventDto.Location,
+                    Location = StringHelpers.NormalizeSpaces(newEventDto.Location),
                     StartTime = newEventDto.StartTime,
                     EndTime = newEventDto.EndTime,
-                    Status = newEventDto.Status,
+                    Status = "Chờ duyệt",
                 };
 
                 _context.Events.Add(newEvent);
@@ -135,7 +144,7 @@ namespace backend.Repositories.EventRepository
                 var ticketTypes = newEventDto.TicketTypes.Select(ticketTypeDto => new Tickettype
                 {
                     EventId = eventId,
-                    TypeName = ticketTypeDto.TypeName,
+                    TypeName = StringHelpers.NormalizeSpaces(ticketTypeDto.TypeName),
                     Price = ticketTypeDto.Price,
                     Quantity = ticketTypeDto.Quantity,
                     Status = ""
@@ -222,11 +231,11 @@ namespace backend.Repositories.EventRepository
 
                 existingEvent.AccountId = updatedEventDto.AccountId;
                 existingEvent.CategoryId = updatedEventDto.CategoryId;
-                existingEvent.EventName = updatedEventDto.EventName;
+                existingEvent.EventName = StringHelpers.NormalizeSpaces(updatedEventDto.EventName);
                 existingEvent.ThemeImage = updatedEventDto.ThemeImage;
                 existingEvent.EventDescription = updatedEventDto.EventDescription;
-                existingEvent.Address = updatedEventDto.Address;
-                existingEvent.Location = updatedEventDto.Location;
+                existingEvent.Address = StringHelpers.NormalizeSpaces(updatedEventDto.Address);
+                existingEvent.Location = StringHelpers.NormalizeSpaces(updatedEventDto.Location);
                 existingEvent.StartTime = updatedEventDto.StartTime;
                 existingEvent.EndTime = updatedEventDto.EndTime;
                 existingEvent.Status = updatedEventDto.Status;
@@ -431,6 +440,12 @@ namespace backend.Repositories.EventRepository
                         EmailService.Instance.SendEventApproveEmail(existingEvent.Account.Email, 1, existingEvent.Account.FullName, existingEvent.EventName);
                     }
                 }
+
+                if (status == "Từ chối")
+                {
+                    EmailService.Instance.SendEventApproveEmail(existingEvent.Account.Email, 3, existingEvent.Account.FullName, existingEvent.EventName);
+                }
+
                 await _context.SaveChangesAsync();
                 return new
                 {
@@ -504,7 +519,7 @@ namespace backend.Repositories.EventRepository
             return data;
         }
 
-        public async Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity)
+        public async Task<object> UpdateTicketQuantity(int ticketTypeId, int addQuantity, int addOrRemove)
         {
             var data = _context.Tickettypes.Find(ticketTypeId);
             if (data == null)
@@ -515,7 +530,17 @@ namespace backend.Repositories.EventRepository
                     status = 400
                 };
             }
-            if ((data.Quantity + addQuantity) < 0)
+
+            if (addOrRemove == 1)
+            {
+                data.Quantity += addQuantity;
+            }
+            else if (addOrRemove == 0)
+            {
+                data.Quantity -= addQuantity;
+            }
+
+            if (data.Quantity < 0)
             {
                 return new
                 {
@@ -523,9 +548,10 @@ namespace backend.Repositories.EventRepository
                     status = 400
                 };
             }
-            data.Quantity += addQuantity;
+
             _context.Tickettypes.Update(data);
             _context.SaveChanges();
+
             return new
             {
                 message = "QuantityUpdated",
@@ -533,7 +559,6 @@ namespace backend.Repositories.EventRepository
                 data
             };
         }
-
 
 
         public async Task<object> GetDiscountCodeByEvent(int eventId)
@@ -561,7 +586,7 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
-                var existingDiscountCode = _context.Discountcodes.FirstOrDefault(dc => dc.EventId == discountcode.EventId && dc.Code == discountcode.Code);
+                var existingDiscountCode = _context.Discountcodes.FirstOrDefault(dc => dc.EventId == discountcode.EventId && dc.Code.Trim().ToLower() == discountcode.Code.Trim().ToLower());
                 if (existingDiscountCode != null)
                 {
                     return new
@@ -669,8 +694,9 @@ namespace backend.Repositories.EventRepository
         {
             var ticketSalesPerTicketType = await (
                 from orderDetail in _context.Orderdetails
+                join order in _context.Orders on orderDetail.OrderId equals order.OrderId
                 join ticketType in _context.Tickettypes on orderDetail.TicketTypeId equals ticketType.TicketTypeId
-                where ticketType.EventId == eventId
+                where ticketType.EventId == eventId && order.Status == "Đã thanh toán"
                 group orderDetail by ticketType into g
                 select new TicketSalesPerTicketType
                 {
@@ -682,6 +708,7 @@ namespace backend.Repositories.EventRepository
 
             return ticketSalesPerTicketType;
         }
+
 
         public async Task<object> GetEventStatus(int eventId)
         {
@@ -777,79 +804,55 @@ namespace backend.Repositories.EventRepository
             try
             {
                 var filterValues = filter.Split(',').Select(f => f.Trim()).ToList();
-                var listWhenFilter = new List<Event>();
 
-                foreach (var filterValue in filterValues)
+                // Lấy tất cả các sự kiện đã duyệt
+                var allApprovedEvents = _context.Events
+                    .Include(e => e.Tickettypes)
+                    .Where(e => e.Status == "Đã duyệt")
+                    .ToList();
+
+                // Lọc sự kiện dựa trên filter values
+                var filteredEvents = allApprovedEvents.Where(e =>
                 {
-                    var checkEvent = _context.Events.Where(e => e.Status == "Đã duyệt").ToList();
+                    bool matchesFilter = false;
 
-                    foreach (var events in checkEvent)
+                    foreach (var filterValue in filterValues)
                     {
-                        if (filterValue.Equals("Miễn phí"))
+                        switch (filterValue)
                         {
-                            var checkTypeOfTicketTypeFree = _context.Tickettypes
-                                .Where(x => x.Price == 0 && x.EventId == events.EventId) 
-                                .FirstOrDefault();
-                            if (checkTypeOfTicketTypeFree != null)
-                            {
-                                listWhenFilter.Add(events);
-                            }
+                            case "Miễn phí":
+                                matchesFilter = e.Tickettypes.Any(t => t.Price == 0);
+                                break;
+                            case "Có phí":
+                                matchesFilter = e.Tickettypes.Any(t => t.Price > 0);
+                                break;
+                            case "Nghệ thuật":
+                                matchesFilter = e.CategoryId == 1;
+                                break;
+                            case "Giáo dục":
+                                matchesFilter = e.CategoryId == 2;
+                                break;
+                            case "Workshop":
+                                matchesFilter = e.CategoryId == 3;
+                                break;
+                            case "Khác":
+                                matchesFilter = e.CategoryId == 4;
+                                break;
                         }
-                        if (filterValue.Equals("Có phí"))
+
+                        if (matchesFilter)
                         {
-                            var checkTypeOfTicketTypePaid = _context.Tickettypes
-                                .Where(x => x.Price > 0 && x.EventId == events.EventId)
-                                .FirstOrDefault();
-                            if (checkTypeOfTicketTypePaid != null)
-                            {
-                                listWhenFilter.Add(events);
-                            }
-                        }
-                        if (filterValue.Equals("Nghệ thuật"))
-                        {
-                            var checkEventByCategory1 = _context.Events.Include(e => e.Tickettypes)
-                                .Where(x => x.CategoryId == 1 && x.EventId == events.EventId && x.Status == "Đã duyệt")
-                                .ToList();
-                            foreach (var eventByCategory1 in checkEventByCategory1)
-                            {
-                                listWhenFilter.Add(eventByCategory1);
-                            }
-                        }
-                        if (filterValue.Equals("Giáo dục"))
-                        {
-                            var checkEventByCategory2 = _context.Events.Include(e => e.Tickettypes)
-                                .Where(x => x.CategoryId == 2 && x.EventId == events.EventId && x.Status == "Đã duyệt")
-                                .ToList();
-                            foreach (var eventByCategory2 in checkEventByCategory2)
-                            {
-                                listWhenFilter.Add(eventByCategory2);
-                            }
-                        }
-                        if (filterValue.Equals("Workshop"))
-                        {
-                            var checkEventByCategory3 = _context.Events.Include(e => e.Tickettypes)
-                                .Where(x => x.CategoryId == 3 && x.EventId == events.EventId && x.Status == "Đã duyệt")
-                                .ToList();
-                            foreach (var eventByCategory3 in checkEventByCategory3)
-                            {
-                                listWhenFilter.Add(eventByCategory3);
-                            }
-                        }
-                        if (filterValue.Equals("Khác"))
-                        {
-                            var checkEventByCategory4 = _context.Events.Include(e => e.Tickettypes)
-                                .Where(x => x.CategoryId == 4 && x.EventId == events.EventId && x.Status == "Đã duyệt")
-                                .ToList();
-                            foreach (var eventByCategory4 in checkEventByCategory4)
-                            {
-                                listWhenFilter.Add(eventByCategory4);
-                            }
+                            break;
                         }
                     }
-                }
 
-                var resultFilter = listWhenFilter.GroupBy(e => e.EventId)
-                    .Select(g => g.First()).OrderBy(e => e.StartTime)
+                    return matchesFilter;
+                }).ToList();
+
+                var resultFilter = filteredEvents
+                    .GroupBy(e => e.EventId)
+                    .Select(g => g.First())
+                    .OrderBy(e => e.StartTime)
                     .ToList();
 
                 return new
@@ -866,6 +869,8 @@ namespace backend.Repositories.EventRepository
                 };
             }
         }
+
+
         public async Task<object> GetAllEventUser()
         {
             var data = _context.Events.Where(e => e.Status == "Đã duyệt")
@@ -900,7 +905,8 @@ namespace backend.Repositories.EventRepository
         {
             try
             {
-                var existingTicketType = _context.Tickettypes.FirstOrDefault(tt => tt.EventId == ticketType.EventId && tt.TypeName == ticketType.TypeName);
+                var comparingTypeName = StringHelpers.NormalizeSpaces(ticketType.TypeName).ToLower();
+                var existingTicketType = _context.Tickettypes.FirstOrDefault(tt => tt.EventId == ticketType.EventId && tt.TypeName.ToLower() == comparingTypeName);
                 if (existingTicketType != null)
                 {
                     return new
@@ -912,7 +918,7 @@ namespace backend.Repositories.EventRepository
                 var newTicketType = new Tickettype
                 {
                     EventId = ticketType.EventId,
-                    TypeName = ticketType.TypeName,
+                    TypeName = StringHelpers.NormalizeSpaces(ticketType.TypeName),
                     Price = ticketType.Price,
                     Quantity = ticketType.Quantity
                 };
@@ -936,6 +942,8 @@ namespace backend.Repositories.EventRepository
                 };
             }
         }
+
+
 
     }
 }
