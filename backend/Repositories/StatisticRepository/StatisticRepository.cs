@@ -1,4 +1,4 @@
-﻿using backend.Models;
+﻿    using backend.Models;
 using DinkToPdf.Contracts;
 using DinkToPdf;
 using Microsoft.EntityFrameworkCore;
@@ -104,7 +104,7 @@ namespace backend.Repositories.StatisticRepository
                         .Where(p => p.Status == "Thanh toán thành công")
                         .Sum(p => p.PaymentAmount ?? 0)
                 })
-                .OrderByDescending(e => e.TotalRevenue)
+                .OrderByDescending(e => e.StartTime)
                 .ToListAsync();
         }
 
@@ -145,8 +145,9 @@ namespace backend.Repositories.StatisticRepository
                     EventName = e.EventName,
                     TotalRevenue = e.Tickettypes
                         .SelectMany(tt => tt.Orderdetails)
-                        .Where(od => od.Order.Payments.Any(p => p.Status == "Thanh toán thành công"))
-                        .Sum(od => od.Quantity * od.TicketType.Price ?? 0)
+                        .SelectMany(od => od.Order.Payments)
+                        .Where(p => p.Status == "Thanh toán thành công")
+                        .Sum(p => p.PaymentAmount ?? 0)
                 })
                 .OrderByDescending(e => e.TotalRevenue)
                 .Take(5)
