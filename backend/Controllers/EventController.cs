@@ -301,7 +301,7 @@ namespace backend.Controllers
         }
 
         //update for organizer
-
+        [Authorize(Roles = "Organizer,User")]
         [HttpPost("addTicketType")]
         public async Task<ActionResult> AddTicketType(TicketTypeDTO ticketType)
         {

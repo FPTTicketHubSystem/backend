@@ -1,6 +1,7 @@
 ﻿using backend.DTOs;
 using backend.Models;
 using backend.Services.NewsService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +18,7 @@ namespace backend.Controllers
         }
 
         //GET: api/news
-        
+        [AllowAnonymous]
         [HttpGet("getAllNews")]
         public async Task<ActionResult> GetAllNews()
         {
@@ -31,7 +32,8 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        //admin
+
+        [Authorize(Roles = "Admin")]
         [HttpGet("getAllNewsAdmin")]
         public async Task<ActionResult> GetAllNewsAdmin([FromQuery] string status = "")
         {
@@ -61,7 +63,7 @@ namespace backend.Controllers
         }*/
 
         //GET: api/news
-        //organizer
+        [Authorize(Roles = "Organizer")]
         [HttpGet("getNewsByAccount")]
         public async Task<ActionResult> GetNewsByAccount(int accountId)
         {
@@ -77,7 +79,7 @@ namespace backend.Controllers
         }
 
         // POST: api/news
-        //organizer
+        [Authorize(Roles = "Organizer")]
         [HttpPost("addNews")]
         public async Task<ActionResult> AddNews(NewsDTO newsDTO)
         {
@@ -91,7 +93,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        //admin
+        [Authorize(Roles = "Admin")]
         [HttpGet("getNewsById/{newsId}")]
         public async Task<ActionResult> GetNewsById(int newsId)
         {
@@ -121,7 +123,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }*/
-        //admin
+        [Authorize(Roles = "Admin")]
         [HttpPost("changeStatusNews")]
         public async Task<ActionResult> ChangeStatusNews(int newsId, string status)
         {
@@ -161,7 +163,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        //organizer
+        [Authorize(Roles = "Organizer")]
         [HttpGet("getNewsForEdit")]
         public async Task<ActionResult> GetNewsForEdit(int newsId)
         {
@@ -172,7 +174,7 @@ namespace backend.Controllers
             }
             catch { return BadRequest(); }
         }
-        //organizer
+        [Authorize(Roles = "Organizer")]
         [HttpPut("editNews")]
         public async Task<ActionResult> EditNews(NewsDTO updateNews)
         {
@@ -189,6 +191,7 @@ namespace backend.Controllers
 
 
         //GET: api/news
+        [AllowAnonymous]
         [HttpGet("getLastestNews")]
         public async Task<ActionResult> GetLastestNews()
         {
@@ -202,7 +205,8 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        //organizer
+
+        [Authorize(Roles = "Organizer")]
         [HttpGet("getNewsByIdUser")]
         public async Task<ActionResult> GetNewsByIdUser(int newsId)
         {

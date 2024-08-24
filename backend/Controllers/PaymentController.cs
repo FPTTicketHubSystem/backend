@@ -25,6 +25,7 @@ namespace backend.Controllers
 {
     [Route("api/payment")]
     [ApiController]
+    [Authorize(Roles = "User")]
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;

@@ -98,7 +98,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins("https://frontend-nine-brown-60.vercel.app")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
@@ -150,8 +150,6 @@ app.UseRouting();
 
 // Use CORS
 app.UseCors("CorsPolicy");
-
-app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

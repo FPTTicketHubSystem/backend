@@ -1,6 +1,7 @@
 ﻿using backend.DTOs;
 using backend.Models;
 using backend.Services.PostCommentService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace backend.Controllers
 {
     [Route("api/comment")]
     [ApiController]
-    //user
+    [Authorize(Roles = "User")]
     public class PostCommentController : ControllerBase
     {
         private readonly IPostCommentService _postcommentService;

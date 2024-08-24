@@ -2,6 +2,7 @@
 using backend.Models;
 using backend.Repositories.ForumRepository;
 using backend.Services.ForumService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
@@ -68,7 +69,7 @@ namespace backend.Controllers
                 return BadRequest();
             }
         }
-        //admin
+        [Authorize(Roles = "Admin")]
         [HttpPost("ChangeStatusPost")]
         public async Task<ActionResult> ChangeStatusPost(int postId, string status)
         {
@@ -219,7 +220,7 @@ namespace backend.Controllers
             var posts = _postService.GetSavedPostByAccountId(accountId);
             return Ok(posts);
         }
-        //admin
+        [Authorize(Roles = "Admin")]
         [HttpGet("getAllPostAdmin")]
         public async Task<ActionResult> GetAllPostAdmin()
         {

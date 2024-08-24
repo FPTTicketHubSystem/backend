@@ -87,7 +87,7 @@ namespace backend.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpGet("getAllPhone")]
         public async Task<ActionResult> GetAllPhone()
         {
@@ -174,21 +174,5 @@ namespace backend.Controllers
                 return BadRequest("Unable to retrieve server time zone information.");
             }
         }
-
-        //[HttpGet("weeklyActivity")]
-        //public async Task<ActionResult> WeeklyActivity(int accountId)
-        //{
-        //    try
-        //    {
-        //        var result = _userService.WeekLyActivity(accountId);
-        //        return Ok(result);
-        //    }
-        //    catch
-        //    {
-        //        return BadRequest();
-        //    }
-        //}
-
-
     }
 }
