@@ -206,7 +206,7 @@ namespace backend.Controllers
             }
         }
 
-        [Authorize(Roles = "Organizer")]
+        [AllowAnonymous]
         [HttpGet("getNewsByIdUser")]
         public async Task<ActionResult> GetNewsByIdUser(int newsId)
         {

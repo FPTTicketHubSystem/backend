@@ -103,7 +103,7 @@ public class EventRatingController : ControllerBase
         var result = await _eventRatingService.GetRateByEventId(eventId);
         return Ok(result);
     }
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "User")]
     [HttpGet("check-status/{eventRatingId}")]
     public async Task<IActionResult> CheckRatingStatus(int eventRatingId)
     {

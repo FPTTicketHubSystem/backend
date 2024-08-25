@@ -94,7 +94,7 @@ namespace backend.Controllers
             }
         }
 
-        [HttpGet("deleteTimeOutOrder")]
+        [HttpPost("deleteTimeOutOrder")]
         public async Task<ActionResult> DeleteTimeOutOrder(PaymentDTO paymentDTO)
         {
             try
@@ -269,7 +269,7 @@ namespace backend.Controllers
             try
             {
                 int _orderId = orderId;
-                Order _order = _context.Orders.Where(x => x.OrderId == _orderId).SingleOrDefault();
+                Order _order = _context.Orders.Where(x => x.OrderId == _orderId).FirstOrDefault();
                 if (_order.Status == "Đã thanh toán")
                 {
                     return Ok(new

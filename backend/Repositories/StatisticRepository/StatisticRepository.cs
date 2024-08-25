@@ -28,7 +28,7 @@ namespace backend.Repositories.StatisticRepository
         public async Task<IEnumerable<MonthlyRevenueDTO>> GetMonthlyRevenue()
         {
             return await _context.Payments
-                .Where(p => p.Status == "Thanh toán thành công" && p.Order.Status == "Thanh toán thành công")
+                .Where(p => p.Status == "1" && p.Order.Status == "Đã thanh toán")
                 .GroupBy(p => new { p.PaymentDate.Value.Year, p.PaymentDate.Value.Month })
                 .Select(g => new MonthlyRevenueDTO
                 {
@@ -36,7 +36,7 @@ namespace backend.Repositories.StatisticRepository
                     Month = g.Key.Month,
                     TotalRevenue = g.Sum(p => p.PaymentAmount ?? 0)
                 })
-                .OrderByDescending(r => r.Year).ThenByDescending(r => r.Month)
+                .OrderByDescending(r => r.Year).ThenBy(r => r.Month)
                 .ToListAsync();
         }
 
@@ -54,7 +54,7 @@ namespace backend.Repositories.StatisticRepository
                         Month = g.Key.Month,
                         TotalRegisteredUsers = g.Count()
                     })
-                    .OrderByDescending(r => r.Year).ThenByDescending(r => r.Month)
+                    .OrderByDescending(r => r.Year).ThenBy(r => r.Month)
                     .ToListAsync();
                 if (data == null)
                 {
@@ -71,7 +71,7 @@ namespace backend.Repositories.StatisticRepository
         // Thống kê top năm sự kiện được đánh giá cao nhất
         public async Task<IEnumerable<TopRatedEventDTO>> GetTopRatedEvents()
         {
-            return await _context.Events
+            var data = await _context.Events
                 .Where(er => er.Status == "Đã duyệt")
                 .Include(e => e.Eventratings)
                 .Select(g => new TopRatedEventDTO
@@ -80,8 +80,26 @@ namespace backend.Repositories.StatisticRepository
                     AverageRating = g.Eventratings.Average(er => er.Rating ?? 0)
                 })
                 .OrderByDescending(e => e.AverageRating)
-                .Take(5)
+                .Take(1)
                 .ToListAsync();
+            if (data.Count() == 5)
+            {
+                return data;
+            }
+            else
+            {
+                return await _context.Events
+                .Where(er => er.Status == "Đã duyệt")
+                .Include(e => e.Eventratings)
+                .Select(g => new TopRatedEventDTO
+                {
+                    EventName = g.EventName,
+                    AverageRating = g.Eventratings.Average(er => er.Rating ?? 0)
+                })
+                .OrderByDescending(e => e.AverageRating)
+                .Take(1)
+                .ToListAsync();
+            }
         }
 
         // Thống kê doanh thu của từng sự kiện
@@ -101,10 +119,10 @@ namespace backend.Repositories.StatisticRepository
                     TotalRevenue = e.Tickettypes
                         .SelectMany(tt => tt.Orderdetails)
                         .SelectMany(od => od.Order.Payments)
-                        .Where(p => p.Status == "Thanh toán thành công")
-                        .Sum(p => p.PaymentAmount ?? 0)
+                        .Where(p => p.Status == "1")
+                        .Sum(p => p.PaymentAmount.Value)
                 })
-                .OrderByDescending(e => e.TotalRevenue)
+                .OrderByDescending(e => e.StartTime)
                 .ToListAsync();
         }
 
@@ -112,26 +130,25 @@ namespace backend.Repositories.StatisticRepository
         public async Task<IEnumerable<TopParticipantsDTO>> GetTopParticipants()
         {
             return await _context.Orders
-                .Where(o => o.Status == "Thanh toán thành công" && o.Payments.Any(p => p.Status == "Thanh toán thành công"))
-                .SelectMany(o => o.Orderdetails)
-                .Where(od => od.Tickets.Any(t => t.IsCheckedIn == true))
-                .GroupBy(od => od.Order.AccountId)
-                .Select(g => new
-                {
-                    AccountId = g.Key,
-                    EventsParticipated = g.Count()
-                })
-                .Join(_context.Accounts,
-                      g => g.AccountId,
-                      a => a.AccountId,
-                      (g, a) => new TopParticipantsDTO
-                      {
-                          AccountName = a.FullName,
-                          EventsParticipated = g.EventsParticipated
-                      })
-                .OrderByDescending(tp => tp.EventsParticipated)
-                .Take(5)
-                .ToListAsync();
+                        .SelectMany(o => o.Orderdetails)
+                        .Where(od => od.Tickets.Any(t => t.IsCheckedIn == true))
+                        .GroupBy(od => od.Order.AccountId)
+                        .Select(g => new
+                        {
+                            AccountId = g.Key,
+                            EventsParticipated = g.Count()
+                        })
+                        .Join(_context.Accounts.Where(a => a.RoleId == 2),
+                              g => g.AccountId,
+                              a => a.AccountId,
+                              (g, a) => new TopParticipantsDTO
+                              {
+                                  AccountName = a.FullName,
+                                  EventsParticipated = g.EventsParticipated
+                              })
+                        .OrderByDescending(tp => tp.EventsParticipated)
+                        .Take(5)
+                        .ToListAsync();
         }
 
         // Thống kê năm sự kiện có doanh thu cao nhất
@@ -145,7 +162,7 @@ namespace backend.Repositories.StatisticRepository
                     EventName = e.EventName,
                     TotalRevenue = e.Tickettypes
                         .SelectMany(tt => tt.Orderdetails)
-                        .Where(od => od.Order.Payments.Any(p => p.Status == "Thanh toán thành công"))
+                        .Where(od => od.Order.Payments.Any(p => p.Status == "1"))
                         .Sum(od => od.Quantity * od.TicketType.Price ?? 0)
                 })
                 .OrderByDescending(e => e.TotalRevenue)
@@ -231,7 +248,7 @@ namespace backend.Repositories.StatisticRepository
             htmlContent.AppendLine("</table>");
 
             // Thống kê top 5 sự kiện được đánh giá cao nhất
-            htmlContent.AppendLine("<h2>Top 5 sự kiện được đánh giá cáo nhất</h2>");
+            htmlContent.AppendLine("<h2>Top 5 sự kiện được đánh giá cao nhất</h2>");
             htmlContent.AppendLine("<table>");
             htmlContent.AppendLine("<tr><th>Tên sự kiện</th><th>Đánh giá trung bình của sự kiện</th></tr>");
             foreach (var eventRating in topRatedEvents)

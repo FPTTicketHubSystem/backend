@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
+using backend.Helper;
 
 namespace backend.Repositories.EventRatingRepository
 {
@@ -51,7 +52,7 @@ namespace backend.Repositories.EventRatingRepository
                     {
                         rating.EventRatingId,
                         rating.EventId,
-                        EventName = rating.Event != null ? rating.Event.EventName : null,
+                        rating.Event.EventName,
                         rating.AccountId,
                         AccountName = rating.Account?.FullName,
                         rating.Rating,
@@ -75,8 +76,30 @@ namespace backend.Repositories.EventRatingRepository
         {
             try
             {
-                eventRating.RatingDate = DateTime.UtcNow;
-                eventRating.Status = "Active";
+                var existingRating = await _context.Eventratings.FindAsync(eventRating.EventRatingId);
+
+                if (existingRating == null)
+                {
+                    eventRating.RatingDate = DateTime.UtcNow;
+                    eventRating.Status = "Active";
+                    _context.Eventratings.Add(eventRating);
+                }
+                else
+                {
+                    if (DateTime.UtcNow - existingRating.RatingDate > TimeSpan.FromHours(24))
+                    {
+                        return new
+                        {
+                            message = "Không thể chỉnh sửa đánh giá sau 24 giờ",
+                            status = 400
+                        };
+                    }
+
+                    existingRating.Rating = eventRating.Rating;
+                    existingRating.Review = StringHelpers.NormalizeSpaces(eventRating.Review);
+                    existingRating.RatingDate = DateTime.UtcNow;
+                    existingRating.Status = "Active";
+                }
 
                 if (eventRating.Rating < 1 || eventRating.Rating > 5)
                 {
@@ -87,34 +110,13 @@ namespace backend.Repositories.EventRatingRepository
                     };
                 }
 
-                var existingRating = await _context.Eventratings
-                    .FindAsync(eventRating.EventRatingId);
-
-                if (existingRating == null)
+                await _context.SaveChangesAsync();
+                return new
                 {
-                    _context.Eventratings.Add(eventRating);
-                    await _context.SaveChangesAsync();
-                    return new
-                    {
-                        message = "Rating Added",
-                        status = 200,
-                        eventRating
-                    };
-                }
-                else
-                {
-                    existingRating.Rating = eventRating.Rating;
-                    existingRating.Review = eventRating.Review;
-                    existingRating.RatingDate = eventRating.RatingDate;
-                    existingRating.Status = eventRating.Status;
-                    await _context.SaveChangesAsync();
-                    return new
-                    {
-                        message = "Rating Updated",
-                        status = 200,
-                        eventRating = existingRating
-                    };
-                }
+                    message = existingRating == null ? "Rating Added" : "Rating Updated",
+                    status = 200,
+                    eventRating = existingRating ?? eventRating
+                };
             }
             catch (Exception ex)
             {
