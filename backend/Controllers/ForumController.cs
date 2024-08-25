@@ -60,7 +60,7 @@ namespace backend.Controllers
                 post.PostText = addPost.PostText;
                 post.PostFile = addPost.PostFile;
                 post.Status = "Chờ duyệt";
-                post.CreateDate = DateTime.Now;
+                post.CreateDate = DateTime.UtcNow;
                 var result = _postService.AddPost(post);
                 return Ok(result);
             }

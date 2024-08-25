@@ -30,7 +30,7 @@ namespace backend.Controllers
                 postcomment.Content = addPostcomment.Content;
                 postcomment.FileComment = addPostcomment.FileComment;
                 postcomment.Status = "Đã bình luận";
-                postcomment.CommentDate = DateTime.Now;
+                postcomment.CommentDate = DateTime.UtcNow;
                 var result = _postcommentService.AddPostcomment(postcomment);
 
                 return Ok(result);

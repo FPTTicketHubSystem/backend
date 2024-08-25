@@ -80,9 +80,11 @@ namespace backend.Repositories.EventRatingRepository
 
                 if (existingRating == null)
                 {
-                    eventRating.RatingDate = DateTime.UtcNow;
-                    eventRating.Status = "Active";
-                    _context.Eventratings.Add(eventRating);
+                    return new
+                    {
+                        message = "NotFound",
+                        status = 404
+                    };
                 }
                 else
                 {

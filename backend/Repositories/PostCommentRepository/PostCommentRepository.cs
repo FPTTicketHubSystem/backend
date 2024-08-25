@@ -16,7 +16,7 @@ namespace backend.Repositories.PostCommentRepository
             var postcomments = _context.Postcomments
                 .Include(p => p.Post)
                 .Include(p => p.Account)
-                .Where(p => p.PostId == postId && p.Status == "Uploaded")
+                .Where(p => p.PostId == postId && p.Status == "Đã bình luận")
                 .OrderByDescending(p => p.CommentDate)
                 .Select(p =>
             new
@@ -71,7 +71,7 @@ namespace backend.Repositories.PostCommentRepository
 
                 editComment.Content = postcomment.Content;
                 editComment.FileComment = postcomment.FileComment;
-                editComment.Status = "Uploaded";
+                editComment.Status = "Đã bình luận";
                 _context.SaveChanges();
                 return new
                 {
@@ -102,7 +102,7 @@ namespace backend.Repositories.PostCommentRepository
             }
             else
             {
-                comment.Status = "Deleted";
+                comment.Status = "Đã xóa";
                 _context.SaveChanges();
                 return new
                 {

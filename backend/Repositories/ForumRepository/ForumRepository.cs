@@ -35,7 +35,7 @@ namespace backend.Repositories.ForumRepository
                   p.CreateDate,
                   p.Postlikes,
                   p.Postfavorites,
-                  countComment = p.Postcomments.Count(),
+                  countComment = p.Postcomments.Where(pc => pc.Status != "Đã xóa").Count(),
                   countLike = p.Postlikes.Count(),
 
               });
@@ -94,7 +94,7 @@ namespace backend.Repositories.ForumRepository
                  p.CreateDate,
                  p.Postlikes,
                  p.Postfavorites,
-                 countComment = p.Postcomments.Count(),
+                 countComment = p.Postcomments.Where(pc => pc.Status != "Đã xóa").Count(),
                  countLike = p.Postlikes.Count()
              });
                 return posts;
@@ -287,7 +287,7 @@ namespace backend.Repositories.ForumRepository
                     p.Post.CreateDate,
                     p.Post.Postlikes,
                     p.Post.Postfavorites,
-                    countComment = p.Post.Postcomments.Count(),
+                    countComment = p.Post.Postcomments.Where(pc => pc.Status != "Đã xóa").Count(),
                     countLike = p.Post.Postlikes.Count()
                 });
                 return posts;
@@ -421,7 +421,7 @@ namespace backend.Repositories.ForumRepository
             try
             {
                 var post = _context.Posts.SingleOrDefault(x => x.PostId == postId);
-                var countComment = _context.Postcomments.Where(x => x.PostId == postId).Count();
+                var countComment = _context.Postcomments.Where(x => x.PostId == postId && x.Status == "Đã bình luận").Count();
                 if (post == null)
                 {
                     return new

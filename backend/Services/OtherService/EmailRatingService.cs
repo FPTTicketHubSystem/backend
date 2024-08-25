@@ -76,7 +76,7 @@ namespace backend.Services.OtherService
                                     {
                                         EventId = evt.EventId,
                                         AccountId = user.AccountId,
-                                        RatingDate = DateTime.Now,
+                                        RatingDate = DateTime.UtcNow,
                                         Status = "Pending"
                                     };
 
